@@ -1,5 +1,11 @@
 # discord-project-thing
 
+ideas so far:
+
+    - Conomy
+    - tomatoTomatoTomato
+    - cyber bullying children
+    - banning 
 
 
 
