@@ -48,3 +48,5 @@ async def on_message(message):
 
 
 
+#client.run(os.getenv(TOKEN))      #Q# make sure that a .env file containing "TOKEN="{the_discord_bot_token}"" is in your project root directory
+client.run(TOKEN)                   #Q# Solution found via: https://stackoverflow.com/a/63530919
