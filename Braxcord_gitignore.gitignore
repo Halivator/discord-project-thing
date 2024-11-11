@@ -1,0 +1,25 @@
+### Braxcord ###
+
+#Q# file containing api_key, api_secret_key, username, password
+##Q# basically anything that we do not want to be uploaded to github. and may also be used. idk yet.
+config.py
+
+##Q# Alternatively... we can do this one. This one seems to be the consensus for storing discord tokens
+# Environments
+.env
+
+
+#Q# including for developer notes
+personal_notes.txt
+
+
+# tutorials referenced:
+##Q# https://medium.com/@t.rosen2101/how-to-create-a-gitignore-file-to-hide-your-api-keys-95b3e6692e41
+#
+##Q# https://github.com/kkrypt0nn/Python-Discord-Bot-Template
+##Q# https://medium.com/@thomaschaigneau.ai/building-and-launching-your-discord-bot-a-step-by-step-guide-f803f7943d33
+##Q# https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
+#
+#
+##Q# https://medium.com/on-discord/how-to-prevent-leaking-your-discord-bots-token-6125118e1222
+
