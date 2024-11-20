@@ -12,7 +12,9 @@ from dotenv import load_dotenv
 import discord 
 from discord.ext import commands, tasks
 
-from itertools import cycle     #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
+from itertools import cycle
+
+import asyncio
 
 import os           #Q# os library is only used to get the TOKEN from the .env file
 load_dotenv()
@@ -64,7 +66,22 @@ async def on_message(message):
         await message.channel.send('Hello!')
 
 
+async def load():
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+                await client.load_extension(f"cogs.{filename[:-3]}")      # [:-3] is for string splicing
+                #print(f"{filename[:-3]} is loaded")    # will be placed inside the cog
+
+async def main():
+    async with client:
+        await load()
+        await client.start(TOKEN)   # replaces client.run(TOKEN)
+
+
+
+asyncio.run(main())
+
 
 
 #client.run(os.getenv(TOKEN))      #Q# make sure that a .env file containing "TOKEN="{the_discord_bot_token}"" is in your project root directory
-client.run(TOKEN)                   #Q# Solution found via: https://stackoverflow.com/a/63530919
+#client.run(TOKEN)                   #Q# Solution found via: https://stackoverflow.com/a/63530919
