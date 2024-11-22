@@ -18,6 +18,7 @@ from itertools import cycle
 import asyncio
 import random
 import os           #Q# os library is only used to get the TOKEN from the .env file
+from data_models import User, Guild, UserGuild, Responses, Base
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -26,6 +27,9 @@ APP_ID = os.getenv("APPLICATION_ID")
 
 MY_GUILD = discord.Object(id=1182049728058380409)
 
+#E Database Setup - for loading in database once tables are made
+#engine = create_engine("sqlite:///bot.db")
+#Base.metadata.create_all(engine)
 
 #slash commands instead of old! commands
 
