@@ -27,8 +27,7 @@ APP_ID = os.getenv("APPLICATION_ID")
 MY_GUILD = discord.Object(id=1182049728058380409)
 
 
-#slash commands instead of old! commands
-
+#slash commands instead of old! commands ----------
 
 
 
@@ -36,7 +35,7 @@ MY_GUILD = discord.Object(id=1182049728058380409)
 
 class MyClient(commands.Bot):
     def __init__(self, *, intents: discord.Intents):
-        super().__init__(command_prefix=['$!'],intents= intents) #intents)
+        super().__init__(command_prefix="$!",intents= intents) #intents)
 
         # A CommandTree is a special type that holds all the application command
         # state required to make it work. This is a separate class because it
@@ -76,15 +75,14 @@ class MyClient(commands.Bot):
 
 
 
-
-intents = discord.Intents.default() #all() #.default()
 # set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
+intents = discord.Intents.default() #all() #.default()
 intents.message_content = True
+bot = MyClient(intents=intents) #command_prefix=['$!'],      # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
 
 
 #client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
 
-bot = MyClient(intents=intents) #command_prefix=['$!'],      # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
 #bot.application_id(APP_ID)
 
 #tree = app_commands.CommandTree(bot)
@@ -138,6 +136,11 @@ async def on_message(message):
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
     
+    if message.content.startswith('$gambling'):
+        #do gambling
+        await message.channel.send("Aw dang it!")
+    
+
     await bot.process_commands(message)
     print(message.content)
 
@@ -171,17 +174,49 @@ async def on_message(message):
 
 # https://dev.to/mannu/4slash-commands-in-discordpy-ofl
 ##```python
-@bot.tree.command(name="mannu",description="Mannu is a good boy")
+@bot.tree.command(name="homie",description="tell me all of your commands and app commands")
 async def slash_command(interaction:discord.Interaction):
-    await interaction.response.send_message("Hello World!")
+    a = []
+    b = []
+    # Remove by value
+    #a.remove("banana")  
+
+    # Remove by index
+    #val = a.pop(1)
+    #print(val)
+    
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            namer = f"{filename[:-3]}"
+            cog = bot.get_cog(namer)
+            commands = cog.get_commands()
+            appcommands = cog.get_app_commands()
+            listeners = cog.get_listeners()
+            co = [c.name for c in commands]
+            ac = [a.name for a in appcommands]
+            li = [l.name for l in listeners]
+            cogresult = f"\ncog: {namer}.py\n commands: {co}\n app commands (use \' / \'): {ac}\n listeners: {li}\n------"
+            print(cogresult)
+            a.append(cogresult)
+    #temp = bot.tree.get_commands()  # guild = MY_GUILD, type=)
+    ##temp2 = bot.get_commands()
+    #for c in temp:
+    #    result = f"\n- ```{c.name}```"
+    #    b.append(result)
+    #ti = [c.name for c in temp]
+    c = f"Loaded from Cogs: {a}\nLoaded from command tree: {b}\n------"
+    
+    print(c)
+    await interaction.response.send_message(c)
 
 
+# WORKS
 @bot.tree.command(name="hello", description="Says hello!")
 async def hello(interaction: discord.Interaction):
     """Says hello!"""
     await interaction.response.send_message("Hello there!")
 
-
+# WORKS
 @bot.tree.command(name="cogchk", description="Checks the cog commands!")
 async def cogchk(interaction: discord.Interaction):
     """Check the cog commands!"""
@@ -192,7 +227,7 @@ async def cogchk(interaction: discord.Interaction):
     await interaction.response.send_message(f"{result}")
 
 
-
+# WORKS
 @bot.tree.command(name="cogchk2", description="Checks the cog commands! Again! Also with app_commands")
 async def cogchk2(interaction: discord.Interaction):
     """Check the cog commands!"""
@@ -206,7 +241,7 @@ async def cogchk2(interaction: discord.Interaction):
 
 
 
-
+# WORKS
 @bot.tree.command()
 @app_commands.describe(
     first_value='The first value you want to add something to',
@@ -231,7 +266,7 @@ async def send(interaction: discord.Interaction, text_to_send: str):
 
 @bot.tree.command(name="other_8ball", description="Says hello!")
 async def other_magic_eightball(interaction: discord.Interaction, question: str):
-    with open(".responses.txt", "r") as f:        # "r" = read mode   
+    with open("./responses.txt", "r") as f:        # "r" = read mode   
         random_responses = f.readlines()                    # file is being treated as a list
         response = random.choice(random_responses)
     
@@ -247,8 +282,31 @@ async def magic_eightball(ctx, *, question):
     
     await ctx.send(response)
 
+@bot.command(name='7ball')
+async def magic_sevenball(ctx, *, question):
+    with open('discord-project-thing/responses.txt', 'r', encoding='utf-8') as f:        # "r" = read mode   
+        random_responses = f.readlines()                    # file is being treated as a list
+        response = random.choice(random_responses)
+    
+    await ctx.send(f"The answer to \"{question}\" is this: {response}")
+
+
+
+@bot.tree.command()
+async def get_username(interaction: discord.Interaction):
+    """Gets the username of the user who invoked the command."""
+    username = interaction.user.name
+    julien = interaction.user.nick
+    feets = interaction.user.joined_at
+    await interaction.response.send_message(f'Your username is {username}. nickname: {julien}. joined at: {feets}')
+
+
+
+
 
 async def load():
+    bot.remove_command('help')
+    
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
             extension = f"cogs.{filename[:-3]}"
@@ -264,6 +322,9 @@ async def main():
         #await on_ready(bot)
         await bot.start(TOKEN)   # replaces client.run(TOKEN)
         
+
+
+
 
 
 

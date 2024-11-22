@@ -11,7 +11,7 @@ class Eightball(commands.Cog):
     
     @commands.Cog.listener()    # events use this decorator
     async def on_ready(self):
-        print("eightball.py is ready!")
+        print("Eightball.py is ready!")
     
     #@commands.command()          # commands use this decorator
     #async def eightball(self, ctx):                      # when working with a cog, `self` goes before anything else in your command
