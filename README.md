@@ -70,3 +70,74 @@ Discord Bot must:
 
 ------
 
+
+***BRANCHES***
+- Quinn
+  - *sql-database-integration*
+
+
+
+
+
+
+
+----------
+
+**CURRENT BUGS/ISSUES:**
+----------------
+- Q- commands / command prefix does not work. on_message(message) logger shows that messages are being read, but they do not get seen as commands
+- Q- app_commands work. However, upon trying to access a local file (see: eightball commands), Discord error: "The application did not respond" occurs.
+  - Q- How do we get console output for when these errors occur?
+- Q- How does the default help command work? Can we set a custom help command if command prefixes aren't recognized?
+
+
+-----------
+
+**CURRENT TASKS**
+-------------
+- Troubleshooting command prefixes (Q) (P)
+- Creating Database models and tables for Users, Guilds, UserGuilds via sqlalchemy (E)
+
+
+
+---------------
+
+**To-Do**
+---------------
+- Database
+  - tables:
+    - Users
+    - Guilds
+    - UserGuild
+    - wallets
+  - sqlalchemy, sqlite
+- Debugging commands and command prefix
+
+
+
+
+
+------------------
+
+*Reference Material*
+--------------------
+
+- Discord.py documentation
+  - More about client.Events
+    - https://discordpy.readthedocs.io/en/latest/api.html#discord.Client.event
+  - (skip to: app_commands.CommandTree)
+    - https://discordpy.readthedocs.io/en/stable/interactions/api.html?highlight=get#discord.app_commands.CommandTree.get_commands
+  - More about discord.ext commands
+    - https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
+    
+- Discord.py examples repo on github
+  - see basic example of how app_commands work
+  - https://github.com/Rapptz/discord.py/blob/master/examples/app_commands/basic.py
+- Github custom Help command using Cogs
+  - https://gist.github.com/nonchris/1c7060a14a9d94e7929aa2ef14c41bc2#file-discord-custom-help-command-py-L13
+- Paradoxial Youtube Tutorials
+  - NOTE: may be outdated due to being 2 years old
+  - Part 3: Activity Status
+    - https://www.youtube.com/watch?v=Erir7v7YXR8
+- Initial code tutorial
+  - https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
