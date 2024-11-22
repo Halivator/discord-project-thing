@@ -21,6 +21,8 @@ import os           #Q# os library is only used to get the TOKEN from the .env f
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
+APP_ID = os.getenv("APPLICATION_ID")
+#APPLICATION_ID="1305627246022627359"
 
 MY_GUILD = discord.Object(id=1182049728058380409)
 
@@ -29,7 +31,6 @@ MY_GUILD = discord.Object(id=1182049728058380409)
 
 
 
-##client = discord.Client()           #Q# creates instance of connection to Discord  ## received error: Client.__init__() missing 1 required keyword-only argument: 'intents'
 
 
 intents = discord.Intents.default() #all() #.default()
@@ -37,10 +38,12 @@ intents = discord.Intents.default() #all() #.default()
 intents.message_content = True
 
 
-bot = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
+#client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
 
-client = commands.Bot(command_prefix='=', intents=intents)     # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
-#tree = app_commands.CommandTree(client)
+bot = commands.Bot(command_prefix='$', intents=intents)     # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
+#bot.application_id(APP_ID)
+
+#tree = app_commands.CommandTree(bot)
 #
 #
 # HERE https://stackoverflow.com/questions/71165431/how-do-i-make-a-working-slash-command-in-discord-py
@@ -55,9 +58,10 @@ client = commands.Bot(command_prefix='=', intents=intents)     # https://discord
 #------------------------------------------------------------------------
 bot_status = cycle(["type in '___' for help", "Status One", "Status Two", "Status Three", "Status Four"])
 
-@tasks.loop(seconds=10)
+@tasks.loop(seconds=5)
 async def change_status():
-    await client.change_presence(activity=discord.Game(next(bot_status)))
+    print(f"activity")
+    await bot.change_presence(status=discord.Status.idle, activity=discord.Game(next(bot_status)))
 
 
 #------------------------------------------------------------------------
@@ -67,29 +71,32 @@ async def change_status():
 
 
 
-@client.event
-async def on_ready(self):       #Q# - on_ready(), on_message() is an example of an event callback, aka when something happens
-    print('We have logged in as {0.user}'.format(client))
+@bot.event
+async def on_ready():       #Q# - on_ready(), on_message() is an example of an event callback, aka when something happens
+    print('We have logged in as {0.user}'.format(bot))
     change_status.start()                #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
-    await self.tree.sync(guild=MY_GUILD)#guild=discord.Object(id=Your guild id))
+    await bot.tree.sync(guild=MY_GUILD) #guild=discord.Object(id=Your guild id))
     print("Ready!")
     #await client.tree.sync() #client.tree.sync()
 
 
-@client.event
+#@client.event
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
 
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
-
-
-
-@client.event
-async def on_message(message):
+    
     await bot.process_commands(message)
     print(message.content)
+
+
+#@bot.event
+#async def on_message(message):
+#    await bot.process_commands(message)
+#    print(message.content)
 
 
 
@@ -101,13 +108,13 @@ async def on_message(message):
 # If it should be in all, remove the argument, but note that
 # it will take some time (up to an hour) to register the
 # command if it's for all guilds.
-@tree.command(
-    name="BraxHello",
-    description="My first application Command",
-    guild=MY_GUILD #discord.Object(MY_GUILD)
-)
-async def first_command(interaction: discord.Interaction):
-    await interaction.response.send_message("Hello! I am BraxCord")
+#@tree.command(
+#    name="BraxHello",
+#    description="My first application Command",
+#    guild=MY_GUILD #discord.Object(MY_GUILD)
+#)
+#async def first_command(interaction: discord.Interaction):
+#    await interaction.response.send_message("Hello! I am BraxCord")
 
 
 
@@ -115,35 +122,40 @@ async def first_command(interaction: discord.Interaction):
 
 # https://dev.to/mannu/4slash-commands-in-discordpy-ofl
 ##```python
-#@client.tree.command(name="mannu",description="Mannu is a good boy")
-#async def slash_command(interaction:discord.Interaction):
-#    await interaction.response.send_message("Hello World!")
-#
-#
-#@client.tree.command(name="hello", description="Says hello!")
-#async def hello(interaction: discord.Interaction):
-#    await interaction.response.send_message("Hello there!")
-#
+@bot.tree.command(name="mannu",description="Mannu is a good boy")
+async def slash_command(interaction:discord.Interaction):
+    await interaction.response.send_message("Hello World!")
 
-#@commands.command(name='8ball')
-#async def magic_eightball(ctx, *, question):
-#    with open("discord-project-thing/responses.txt", "r") as f:        # "r" = read mode   
-#        random_responses = f.readlines()                    # file is being treated as a list
-#        response = random.choice(random_responses)
-#    
-#    await ctx.send(response)
+
+@bot.tree.command(name="hello", description="Says hello!")
+async def hello(interaction: discord.Interaction):
+    await interaction.response.send_message("Hello there!")
+
+@commands.command(name='8ball')
+async def magic_eightball(ctx, *, question):
+    with open("discord-project-thing/responses.txt", "r") as f:        # "r" = read mode   
+        random_responses = f.readlines()                    # file is being treated as a list
+        response = random.choice(random_responses)
+    
+    await ctx.send(response)
 
 
 async def load():
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
-                await client.load_extension(f"cogs.{filename[:-3]}")      # [:-3] is for string splicing
+            extension = f"cogs.{filename[:-3]}"
+            await bot.load_extension(extension)      # [:-3] is for string splicing
                 #print(f"{filename[:-3]} is loaded")    # will be placed inside the cog
+    #await bot.tree.sync(guild=MY_GUILD)#guild=discord.Object(id=Your guild id))
+
 
 async def main():
-    async with client:
+    async with bot:
+        #bot.setup_hook = load()
         await load()
-        await client.start(TOKEN)   # replaces client.run(TOKEN)
+        #await on_ready(bot)
+        await bot.start(TOKEN)   # replaces client.run(TOKEN)
+        
 
 
 
