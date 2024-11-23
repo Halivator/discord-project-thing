@@ -9,7 +9,9 @@ from discord     import app_commands
 import asyncio
 
 class Ping(commands.Cog):
-    
+    """
+    This one has commands to check connectivity and responses
+    """
     
     def __init__(self, bot):
         self.bot = bot

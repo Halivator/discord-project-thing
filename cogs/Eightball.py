@@ -8,6 +8,14 @@ import os           #Q# os library is only used to get the TOKEN from the .env f
 
 
 class Eightball(commands.Cog):
+    """
+    Lets go gambling!
+    AW DANG IT
+    AW DANG IT
+    AW DANG IT
+    AW DANG IT
+    """
+    
     def __init__(self, client):
         self.client = client
     
