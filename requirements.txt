@@ -1,3 +1,4 @@
 # Python package requirements
 discord.py
 python-dotenv
+aiofiles

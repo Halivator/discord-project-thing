@@ -15,6 +15,8 @@ from discord.ext import commands, tasks
 
 from itertools import cycle
 
+import aiofiles
+import logging
 import asyncio
 import random
 import os           #Q# os library is only used to get the TOKEN from the .env file
@@ -30,12 +32,13 @@ MY_GUILD = discord.Object(id=1182049728058380409)
 #slash commands instead of old! commands ----------
 
 
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
 
 
 class MyClient(commands.Bot):
-    def __init__(self, *, intents: discord.Intents):
-        super().__init__(command_prefix="$!",intents= intents) #intents)
+    def __init__(self, command_prefix, log_handler, log_level, *, intents: discord.Intents):
+        super().__init__(command_prefix=command_prefix, log_handler=log_handler, log_level=log_level, intents= intents) #intents)
 
         # A CommandTree is a special type that holds all the application command
         # state required to make it work. This is a separate class because it
@@ -78,7 +81,7 @@ class MyClient(commands.Bot):
 # set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
 intents = discord.Intents.default() #all() #.default()
 intents.message_content = True
-bot = MyClient(intents=intents) #command_prefix=['$!'],      # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
+bot = MyClient(command_prefix='!',log_handler=handler,log_level=logging.DEBUG,intents=intents) #command_prefix=['$!'],      # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
 
 
 #client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
@@ -128,27 +131,28 @@ async def on_ready():       #Q# - on_ready(), on_message() is an example of an e
 
 
 #@client.event
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
-    
-    if message.content.startswith('$gambling'):
-        #do gambling
-        await message.channel.send("Aw dang it!")
-    
-
-    await bot.process_commands(message)
-    print(message.content)
+#@bot.event
+#async def on_message(message):
+#    if message.author == bot.user:
+#        return
+#
+#    if message.content.startswith('$hello'):
+#        await message.channel.send('Hello!')
+#    
+#    if message.content.startswith('$gambling'):
+#        #do gambling
+#        await message.channel.send("Aw dang it!")
+#    
+#
+#    await bot.process_commands(message)
+#    print(message.content)
 
 
 #@bot.event
 #async def on_message(message):
 #    await bot.process_commands(message)
 #    print(message.content)
+
 
 
 
@@ -266,32 +270,44 @@ async def send(interaction: discord.Interaction, text_to_send: str):
 
 @bot.tree.command(name="other_8ball", description="Says hello!")
 async def other_magic_eightball(interaction: discord.Interaction, question: str):
-    with open("./responses.txt", "r") as f:        # "r" = read mode   
+    async with open("/cogs/responses.txt", "r") as f:        # "r" = read mode   
         random_responses = f.readlines()                    # file is being treated as a list
-        response = random.choice(random_responses)
+        await asyncio.sleep(5)
+        response = await random.choice(random_responses)
     
     await interaction.response.send_message(f"The answer to \"{question}\" is this: {response}")
 
 
 
-@commands.command(name='8ball')
-async def magic_eightball(ctx, *, question):
-    with open("discord-project-thing/responses.txt", "r") as f:        # "r" = read mode   
-        random_responses = f.readlines()                    # file is being treated as a list
-        response = random.choice(random_responses)
+@bot.command(alias=['8ball', '8b', 'eightball', '8 ball'])
+async def magic_eightball(ctx, *, question=None):
+    #with open("responses.txt", "r") as f:        # "r" = read mode   
+    #    random_responses = f.readlines()                    # file is being treated as a list
+    #    response = random.choice(random_responses)
     
-    await ctx.send(response)
+    if question is not None:
+        with open ('responses.txt', 'r',  encoding='utf-8') as f:
+            random_responses = f.readlines()
+            response = random.choice(random_responses)
+        
+            await ctx.send(f"The answer to \"{question}\" is this: {response}")
+    else:
+        await ctx.send('You did not ask a question.')
+    
+    
+
 
 @bot.command(name='7ball')
 async def magic_sevenball(ctx, *, question):
-    with open('discord-project-thing/responses.txt', 'r', encoding='utf-8') as f:        # "r" = read mode   
+    async with open("./responses.txt", 'r', encoding='utf-8') as f:        # "r" = read mode   
         random_responses = f.readlines()                    # file is being treated as a list
         response = random.choice(random_responses)
+        await response
     
     await ctx.send(f"The answer to \"{question}\" is this: {response}")
 
 
-
+#WORKS
 @bot.tree.command()
 async def get_username(interaction: discord.Interaction):
     """Gets the username of the user who invoked the command."""
