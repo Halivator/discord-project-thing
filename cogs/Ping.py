@@ -25,40 +25,59 @@ class Ping(commands.Cog):
         
     #@client.tree.command()
     
-    @app_commands.command(description="Sends the bot's latency in milliseconds (ms.)")
-    async def ping(self, interaction: discord.Interaction): #, text_to_send: str):
-        bot_latency = round(self.bot.latency * 1000)
-        await interaction.response.send_message(f"Pong! {bot_latency} ms.") # {text_to_send}")
+    # SLASH COMMAND ONLY
+    #@app_commands.command(description="Sends the bot's latency in milliseconds (ms.)")
+    #async def ping(self, interaction: discord.Interaction): #, text_to_send: str):
+    #    bot_latency = round(self.bot.latency * 1000)
+    #    await interaction.response.send_message(f"Pong! {bot_latency} ms.") # {text_to_send}")
     
-    #@commands.hybrid_command(name="ping", description="Sends the bot's latency in milliseconds (ms.)", with_app_command=True)
-    #async def ping(self, ctx: commands.Context): #interaction: discord.Interaction): #, text_to_send: str):
-    #    #bot_latency = round(self.bot.latency * 1000)
-    #    await ctx.send_message(f"Pong! {round(self.bot.latency * 1000)} ms.")
-        
+    
+    # HYBRID COMMAND (PREFIXED COMMAND AND SLASH COMMAND)
+    @commands.hybrid_command(name="ping", description="Sends the bot's latency in milliseconds (ms.)", with_app_command=True)
+    async def ping(self, ctx: commands.Context): #interaction: discord.Interaction): #, text_to_send: str):
+        #bot_latency = round(self.bot.latency * 1000)
+        await ctx.send(f"Pong! {round(self.bot.latency * 1000)} ms.")
+    
+    # PREFIXED COMMAND ONLY
+    @commands.command(name="pung", description="Sends the bot's latency in milliseconds (ms.)")
+    async def pung(self, ctx): #interaction: discord.Interaction): #, text_to_send: str):
+        #bot_latency = round(self.bot.latency * 1000)
+        await ctx.send(f"Pong! {round(self.bot.latency * 1000)} ms.")
+    
+    # ------------------------------------
     
     @commands.hybrid_command(name="pong", description="Testing a condition with hybrid command", with_app_command=True)
     async def pong(self, ctx: commands.Context, message: str = None): #interaction: discord.Interaction): #, text_to_send: str):
-        if message is not None:
-            message = message
-        elif message is None:
-            message = str("theres no message here...")
+        #if message is not None:
+        #    message = message
+        if message == 'test': 
+            message = 'https://tenor.com/bFrLl.gif'
+        elif message is None: 
+            message = 'theres no message here...' 
         await ctx.defer()
         await asyncio.sleep(5)
-        await ctx.send_message(message) # {text_to_send}")
-
-
-    @commands.hybrid_command(name="echo", description="Echoes a message", with_app_command=True)
-    @app_commands.describe(message="The message to echo")
-    async def echo(self, ctx: commands.Context, *, message: str):
         await ctx.send(message)
+        #await ctx.send_message(message) # {text_to_send}")
 
-    @commands.command()
-    async def oldschool(self, ctx, *, message: str):
-        await ctx.send(message)
 
-    @commands.command()
-    async def oldie(self, ctx):
-        await ctx.send("this is an oldie")
+    #@commands.hybrid_command(name="echo", description="Echoes a message", with_app_command=True)
+    #@app_commands.describe(message="The message to echo")
+    #async def echo(self, ctx: commands.Context, *, message: str):
+    #    await ctx.send(message)
+
+    #@commands.command()
+    #async def oldschool(self, ctx, *, message: str):
+    #    await ctx.send(message)
+#
+    #@commands.command()
+    #async def oldie(self, ctx):
+    #    await ctx.send("this is an oldie")
+
+
+
+
+
+
 
 
 async def setup(bot):

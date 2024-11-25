@@ -14,9 +14,10 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 from itertools import cycle
-
+#import mylib
 import aiofiles
 import logging
+import logging.handlers
 import asyncio
 import random
 import os           #Q# os library is only used to get the TOKEN from the .env file
@@ -25,9 +26,11 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 
 APP_ID = os.getenv("APPLICATION_ID")
 #APPLICATION_ID="1305627246022627359"
+T_GUILD = os.getenv("TEST_GUILD")
+t_id = int(T_GUILD)
+MY_GUILD = discord.Object(id=t_id)
 
-MY_GUILD = discord.Object(id=1182049728058380409)
-
+logger = logging.getLogger(__name__)
 
 #slash commands instead of old! commands ----------
 
@@ -108,6 +111,7 @@ bot_status = cycle(["type in '___' for help", "Status One", "Status Two", "Statu
 async def change_status():
     #print('{bot_status}'.format)
     next_activity = next(bot_status)
+    logger.info(f"changing activity from {bot_status.__getstate__} to \'{next_activity}\'...")
     print(f"changing activity now to \'{next_activity}\'")
     await bot.change_presence(status=discord.Status.idle, activity=discord.Game(next_activity))
 
@@ -178,40 +182,40 @@ async def on_ready():       #Q# - on_ready(), on_message() is an example of an e
 
 # https://dev.to/mannu/4slash-commands-in-discordpy-ofl
 ##```python
-@bot.tree.command(name="homie",description="tell me all of your commands and app commands")
-async def slash_command(interaction:discord.Interaction):
-    a = []
-    b = []
-    # Remove by value
-    #a.remove("banana")  
-
-    # Remove by index
-    #val = a.pop(1)
-    #print(val)
-    
-    for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
-            namer = f"{filename[:-3]}"
-            cog = bot.get_cog(namer)
-            commands = cog.get_commands()
-            appcommands = cog.get_app_commands()
-            listeners = cog.get_listeners()
-            co = [c.name for c in commands]
-            ac = [a.name for a in appcommands]
-            li = [l.name for l in listeners]
-            cogresult = f"\ncog: {namer}.py\n commands: {co}\n app commands (use \' / \'): {ac}\n listeners: {li}\n------"
-            print(cogresult)
-            a.append(cogresult)
-    #temp = bot.tree.get_commands()  # guild = MY_GUILD, type=)
-    ##temp2 = bot.get_commands()
-    #for c in temp:
-    #    result = f"\n- ```{c.name}```"
-    #    b.append(result)
-    #ti = [c.name for c in temp]
-    c = f"Loaded from Cogs: {a}\nLoaded from command tree: {b}\n------"
-    
-    print(c)
-    await interaction.response.send_message(c)
+#@bot.tree.command(name="homie",description="tell me all of your commands and app commands")
+#async def slash_command(interaction:discord.Interaction):
+#    a = []
+#    b = []
+#    # Remove by value
+#    #a.remove("banana")  
+#
+#    # Remove by index
+#    #val = a.pop(1)
+#    #print(val)
+#    
+#    for filename in os.listdir("./cogs"):
+#        if filename.endswith(".py"):
+#            namer = f"{filename[:-3]}"
+#            cog = bot.get_cog(namer)
+#            commands = cog.get_commands()
+#            appcommands = cog.get_app_commands()
+#            listeners = cog.get_listeners()
+#            co = [c.name for c in commands]
+#            ac = [a.name for a in appcommands]
+#            li = [l.name for l in listeners]
+#            cogresult = f"\ncog: {namer}.py\n commands: {co}\n app commands (use \' / \'): {ac}\n listeners: {li}\n------"
+#            print(cogresult)
+#            a.append(cogresult)
+#    #temp = bot.tree.get_commands()  # guild = MY_GUILD, type=)
+#    ##temp2 = bot.get_commands()
+#    #for c in temp:
+#    #    result = f"\n- ```{c.name}```"
+#    #    b.append(result)
+#    #ti = [c.name for c in temp]
+#    c = f"Loaded from Cogs: {a}\nLoaded from command tree: {b}\n------"
+#    
+#    print(c)
+#    await interaction.response.send_message(c)
 
 
 # WORKS
@@ -256,6 +260,9 @@ async def add(interaction: discord.Interaction, first_value: int, second_value: 
     await interaction.response.send_message(f'{first_value} + {second_value} = {first_value + second_value}')
 
 
+
+
+"""
 # The rename decorator allows us to change the display of the parameter on Discord.
 # In this example, even though we use `text_to_send` in the code, the client will use `text` instead.
 # Note that other decorators will still refer to it as `text_to_send` in the code.
@@ -263,58 +270,57 @@ async def add(interaction: discord.Interaction, first_value: int, second_value: 
 @app_commands.rename(text_to_send='text')
 @app_commands.describe(text_to_send='Text to send in the current channel')
 async def send(interaction: discord.Interaction, text_to_send: str):
-    """Sends the text into the current channel."""
+    ###""Sends the text into the current channel.""
     await interaction.response.send_message(text_to_send)
+"""
 
 
 
-@bot.tree.command(name="other_8ball", description="Says hello!")
-async def other_magic_eightball(interaction: discord.Interaction, question: str):
-    async with open("/cogs/responses.txt", "r") as f:        # "r" = read mode   
-        random_responses = f.readlines()                    # file is being treated as a list
-        await asyncio.sleep(5)
-        response = await random.choice(random_responses)
-    
-    await interaction.response.send_message(f"The answer to \"{question}\" is this: {response}")
 
-
-
-@bot.command(alias=['8ball', '8b', 'eightball', '8 ball'])
-async def magic_eightball(ctx, *, question=None):
-    #with open("responses.txt", "r") as f:        # "r" = read mode   
-    #    random_responses = f.readlines()                    # file is being treated as a list
-    #    response = random.choice(random_responses)
-    
-    if question is not None:
-        with open ('responses.txt', 'r',  encoding='utf-8') as f:
-            random_responses = f.readlines()
-            response = random.choice(random_responses)
-        
-            await ctx.send(f"The answer to \"{question}\" is this: {response}")
-    else:
-        await ctx.send('You did not ask a question.')
-    
+#@bot.command(alias=['8ball', '8b', 'eightball', '8 ball'])
+#async def magic_eightball(ctx, *, question=None):
+#    #with open("responses.txt", "r") as f:        # "r" = read mode   
+#    #    random_responses = f.readlines()                    # file is being treated as a list
+#    #    response = random.choice(random_responses)
+#    
+#    if question is not None:
+#        with open ('responses.txt', 'r',  encoding='utf-8') as f:
+#            random_responses = f.readlines()
+#            response = random.choice(random_responses)
+#        
+#            await ctx.send(f"The answer to \"{question}\" is this: {response}")
+#    else:
+#        await ctx.send('You did not ask a question.')
+#    
     
 
 
-@bot.command(name='7ball')
-async def magic_sevenball(ctx, *, question):
-    async with open("./responses.txt", 'r', encoding='utf-8') as f:        # "r" = read mode   
-        random_responses = f.readlines()                    # file is being treated as a list
-        response = random.choice(random_responses)
-        await response
-    
-    await ctx.send(f"The answer to \"{question}\" is this: {response}")
+#@bot.command(name='7ball')
+#async def magic_sevenball(ctx, *, question):
+#    
+#    async with open("./responses.txt", 'r', encoding='utf-8') as f:        # "r" = read mode   
+#        random_responses = f.readlines()                    # file is being treated as a list
+#        response = random.choice(random_responses)
+#        await response
+#
+#    await ctx.send(f"The answer to \"{question}\" is this: {response}")
 
 
 #WORKS
 @bot.tree.command()
 async def get_username(interaction: discord.Interaction):
     """Gets the username of the user who invoked the command."""
+    logger.info('Doing something')
     username = interaction.user.name
     julien = interaction.user.nick
     feets = interaction.user.joined_at
     await interaction.response.send_message(f'Your username is {username}. nickname: {julien}. joined at: {feets}')
+
+
+
+
+
+
 
 
 
@@ -332,7 +338,29 @@ async def load():
 
 
 async def main():
+    """Main function."""
+    # LOGGING (https://medium.com/@thomaschaigneau.ai/building-and-launching-your-discord-bot-a-step-by-step-guide-f803f7943d33)
+    # https://docs.python.org/3/library/logging.html#module-logging
+    # https://discordpy.readthedocs.io/en/latest/logging.html
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.DEBUG)
+    logging.getLogger('discord.http').setLevel(logging.INFO)
+
+    handler = logging.handlers.RotatingFileHandler(
+        filename= 'logs/discord.log',      #f"{os.getenv('DATABASE_VOLUME')}/discord.log",
+        encoding='utf-8',
+        maxBytes=32 * 1024 * 1024,  #32 MiB
+        backupCount=5,  # Rotate through 5 files
+    )
+    date_format = '%Y-%m-%d %H:%M:%S'
+    formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', date_format, style='{')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.info('Started')
+    # END LOGGING
+    
     async with bot:
+        logger.info('Doing something')
         #bot.setup_hook = load()
         await load()
         #await on_ready(bot)
@@ -345,7 +373,7 @@ async def main():
 
 
 asyncio.run(main())
-
+logger.info('Finished')
 
 
 #client.run(os.getenv(TOKEN))      #Q# make sure that a .env file containing "TOKEN="{the_discord_bot_token}"" is in your project root directory
