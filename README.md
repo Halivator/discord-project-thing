@@ -74,6 +74,8 @@ Discord Bot must:
 ***BRANCHES***
 - Quinn
   - *sql-database-integration*
+- Eli
+  - *database-creation* 
 
 
 
@@ -96,7 +98,7 @@ Discord Bot must:
 **CURRENT TASKS**
 -------------
 - Troubleshooting command prefixes (Q) (P)
-- Creating Database models and tables for Users, Guilds, UserGuilds via sqlalchemy (E)
+- Creating Database models and tables for Users, Guilds, UserGuilds via SQLite & SQLAlchemy (E) *complete*
 
 
 
@@ -104,18 +106,7 @@ Discord Bot must:
 
 **To-Do**
 ---------------
-- Database
-  - tables:
-    - Users
-    - Guilds
-    - UserGuild
-    - wallets
-  - sqlalchemy, sqlite
 - Debugging commands and command prefix
-
-
-
-
 
 ------------------
 
