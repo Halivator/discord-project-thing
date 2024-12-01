@@ -92,6 +92,7 @@ async def on_message(message):
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
 
+#Code Source: Chatgpt - https://chatgpt.com/share/674ce36d-ba44-8002-a0f0-4cc8ceb814de
 @bot.command(name="market")
 async def market(ctx):
     # Create an embed

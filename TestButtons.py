@@ -1,8 +1,8 @@
 ### BraxCord Discord Bot
 # ButtonsTest.py
 # Created: 11/27/24 ~ 7:32pm
-# Last Updated: 
-# YELLOW HELLO
+# Last Updated: 12/1/24 
+# Code Source: ChatGPT - https://chatgpt.com/share/674ce36d-ba44-8002-a0f0-4cc8ceb814de
 #############################################################################
 
 import discord
@@ -15,7 +15,7 @@ class FarmersMarketCog(commands.Cog):
 
   @commands.Cog.listener()    # events use this decorator
   async def on_ready(self):
-    print("Eightball.py is ready!")
+    print("market.py is ready!")
 
   # Set up the bot with a command prefix
   intents = discord.Intents.default()
