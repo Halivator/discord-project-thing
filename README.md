@@ -74,6 +74,8 @@ Discord Bot must:
 ***BRANCHES***
 - Quinn
   - *sql-database-integration*
+- Eli
+  - *database-creation* 
 
 
 
@@ -104,18 +106,7 @@ Discord Bot must:
 
 **To-Do**
 ---------------
-- Database
-  - tables:
-    - Users
-    - Guilds
-    - UserGuild
-    - wallets
-  - sqlalchemy, sqlite
 - Debugging commands and command prefix
-
-
-
-
 
 ------------------
 
