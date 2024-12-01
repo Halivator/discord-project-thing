@@ -98,7 +98,7 @@ Discord Bot must:
 **CURRENT TASKS**
 -------------
 - Troubleshooting command prefixes (Q) (P)
-- Creating Database models and tables for Users, Guilds, UserGuilds via sqlalchemy (E)
+- Creating Database models and tables for Users, Guilds, UserGuilds via SQLite & SQLAlchemy (E) *complete*
 
 
 
