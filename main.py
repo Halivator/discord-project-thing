@@ -1,7 +1,7 @@
 ### BraxCord Discord Bot
 # main.py
 # Created: 11/11/24 ~ 5:21pm
-# Last Updated: 11/11/24 ~ 5:21pm
+# Last Updated: 12/01/24 ~ 5:21pm
 
 #Q# NOTE: 11/11-Q: tutorial followed for initial code setup below:  (planning to remove some of the comment annotations at a later date)
 # https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
@@ -70,62 +70,82 @@ bot = MyClient(command_prefix='!',log_handler=handler,log_level=logging.DEBUG,in
 ##client = discord.Client()           #Q# creates instance of connection to Discord  ## received error: Client.__init__() missing 1 required keyword-only argument: 'intents'
 
 
-intents = discord.Intents.default()
-# set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
-intents.message_content = True
-client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
+#intents = discord.Intents.default()
+## set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
+#intents.message_content = True
+#client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
 
 
 #Q# More about @client.events  :     https://discordpy.readthedocs.io/en/latest/api.html#discord.Client.event
 
-@client.event
+@bot.event
 async def on_ready():       #Q# - on_ready(), on_message() is an example of an event callback, aka when something happens
-    print('We have logged in as {0.user}'.format(client))
+    print('We have logged in as {0.user}'.format(bot))
+    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    #print(f"Cycle timer tick has been set to {timetick}")
+    print("Ready!")
 
 
 
-@client.event
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
 
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
 
-@bot.command(name="market")
-async def market(ctx):
-    # Create an embed
-    embed = discord.Embed(
-        title="Market Actions",
-        description="Choose what you want to do in the market:",
-        color=discord.Color.blue()
+    await bot.process_commands(message)
+    print(message.content)
+
+
+
+
+
+
+
+async def load():
+    """Loads the extensions in the cogs/ folder"""
+    bot.remove_command('help')
+    
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            extension = f"cogs.{filename[:-3]}"
+            await bot.load_extension(extension)
+
+
+async def main():
+    """Main function."""
+    # LOGGING (https://medium.com/@thomaschaigneau.ai/building-and-launching-your-discord-bot-a-step-by-step-guide-f803f7943d33)
+    # https://docs.python.org/3/library/logging.html#module-logging
+    # https://discordpy.readthedocs.io/en/latest/logging.html
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.DEBUG)
+    logging.getLogger('discord.http').setLevel(logging.INFO)
+
+    handler = logging.handlers.RotatingFileHandler(
+        filename= 'logs/discord.log',      #f"{os.getenv('DATABASE_VOLUME')}/discord.log",
+        encoding='utf-8',
+        maxBytes=32 * 1024 * 1024,  #32 MiB
+        backupCount=5,  # Rotate through 5 files
     )
-    embed.add_field(name="Buy", value="Purchase items from the market.", inline=False)
-    embed.add_field(name="Sell", value="Sell your items in the market.", inline=False)
-    embed.set_footer(text="Use the buttons below to proceed.")
+    date_format = '%Y-%m-%d %H:%M:%S'
+    formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', date_format, style='{')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.info('Started')
+    # END LOGGING
+    
+    async with bot:
+        logger.info('running: main > _async with bot_')
+        await load()
+        await bot.start(TOKEN)   # replaces client.run(TOKEN)
 
-    # Create two buttons
-    button1 = Button(label="Buy", style=discord.ButtonStyle.green)
-    button2 = Button(label="Sell", style=discord.ButtonStyle.red)
 
-    # Define what happens when the buttons are clicked
-    async def button1_callback(interaction):
-        await interaction.response.send_message("You clicked the Buy button!", ephemeral=True)
-
-    async def button2_callback(interaction):
-        await interaction.response.send_message("You clicked the Sell button!", ephemeral=True)
-
-    # Assign the callback to the buttons
-    button1.callback = button1_callback
-    button2.callback = button2_callback
-
-    # Create a View to hold the buttons
-    view = View()
-    view.add_item(button1)
-    view.add_item(button2)
-
-    # Send the message with the embed and buttons
-    await ctx.send(embed=embed, view=view)
 
 #client.run(os.getenv(TOKEN))      #Q# make sure that a .env file containing "TOKEN="{the_discord_bot_token}"" is in your project root directory
-client.run(TOKEN)                   #Q# Solution found via: https://stackoverflow.com/a/63530919
+#bot.run(TOKEN)                   #Q# Solution found via: https://stackoverflow.com/a/63530919
+
+
+asyncio.run(main())
+logger.info(f'---------\nFinished\n----------')
