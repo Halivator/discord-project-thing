@@ -360,7 +360,7 @@ async def main():
     # END LOGGING
     
     async with bot:
-        logger.info('Doing something')
+        logger.info('running: main > _async with bot_')
         #bot.setup_hook = load()
         await load()
         #await on_ready(bot)
