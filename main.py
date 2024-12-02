@@ -82,6 +82,7 @@ class MyClient(commands.Bot):
 intents = discord.Intents.default() #all() #.default()
 # set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
 intents.message_content = True
+intents.presences = True
 
 
 #client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
@@ -114,11 +115,6 @@ async def change_status():
 
 
 #------------------------------------------------------------------------
-
-
-
-
-
 
 @bot.event
 async def on_ready():       #Q# - on_ready(), on_message() is an example of an event callback, aka when something happens
