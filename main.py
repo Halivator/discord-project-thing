@@ -31,7 +31,7 @@ APP_ID = os.getenv("APPLICATION_ID")
 MY_GUILD = discord.Object(id=1182049728058380409)
 
 #E Database Setup - for loading database into project
-engine = create_engine("sqlite:///Bot.db")
+engine = create_engine("sqlite:///Bot.db") #E - will load in if the db file is in the same folder as project
 Base.metadata.create_all(engine)
 
 #slash commands instead of old! commands
@@ -103,7 +103,7 @@ timetick = 15
 
 #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 #------------------------------------------------------------------------
-bot_status = cycle(["type in '___' for help", "Status One", "Status Two", "Status Three", "Status Four"])
+bot_status = cycle(["type in '!help' for help", "throwing LOTS of tomatoes", "Status Two", "Status Three", "Status Four"])
 
 @tasks.loop(seconds=timetick)
 async def change_status():
