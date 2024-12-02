@@ -19,9 +19,11 @@ import asyncio
 import random
 import os           #Q# os library is only used to get the TOKEN from the .env file
 from data_models import User, Guild, UserGuild, Responses, Base
-from database import add_user
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+from fastapi import FastAPI, HTTPException
+
+app = FastAPI(); #E create instance of FastAPI class
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -58,24 +60,6 @@ class MyClient(commands.Bot):
         # This copies the global commands over to your guild.
         self.tree.copy_global_to(guild=MY_GUILD)
         await self.tree.sync(guild=MY_GUILD)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -262,10 +246,16 @@ async def main():
         await load()
         #await on_ready(bot)
         await bot.start(TOKEN)   # replaces client.run(TOKEN)
-        
 
-asyncio.run(main())
 
+#E - Used to resolve traceback loop - https://makubob.medium.com/combining-fastapi-and-discord-py-9aad07a5cfb6
+async def run(): 
+    try: 
+        await bot.start(TOKEN)
+    except KeyboardInterrupt: 
+        await bot.logout()
+
+asyncio.create_task(run())
 
 
 #client.run(os.getenv(TOKEN))      #Q# make sure that a .env file containing "TOKEN="{the_discord_bot_token}"" is in your project root directory
