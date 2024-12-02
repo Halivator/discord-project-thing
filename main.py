@@ -1,7 +1,7 @@
 ### BraxCord Discord Bot
 # main.py
 # Created: 11/11/24 ~ 5:21pm
-# Last Updated: 11/11/24 ~ 5:21pm
+# Last Updated: 12/01/24 ~ 7:34pm
 
 #Q# NOTE: 11/11-Q: tutorial followed for initial code setup below:  (planning to remove some of the comment annotations at a later date)
 # https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
@@ -19,6 +19,9 @@ import asyncio
 import random
 import os           #Q# os library is only used to get the TOKEN from the .env file
 from data_models import User, Guild, UserGuild, Responses, Base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -27,16 +30,11 @@ APP_ID = os.getenv("APPLICATION_ID")
 
 MY_GUILD = discord.Object(id=1182049728058380409)
 
-#E Database Setup - for loading in database once tables are made
-#engine = create_engine("sqlite:///bot.db")
-#Base.metadata.create_all(engine)
+#E Database Setup - for loading database into project
+engine = create_engine("sqlite:///Bot.db")
+Base.metadata.create_all(engine)
 
 #slash commands instead of old! commands
-
-
-
-
-
 
 class MyClient(commands.Bot):
     def __init__(self, *, intents: discord.Intents):
@@ -268,8 +266,6 @@ async def main():
         #await on_ready(bot)
         await bot.start(TOKEN)   # replaces client.run(TOKEN)
         
-
-
 
 asyncio.run(main())
 
