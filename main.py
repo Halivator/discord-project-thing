@@ -19,6 +19,7 @@ import asyncio
 import random
 import os           #Q# os library is only used to get the TOKEN from the .env file
 from data_models import User, Guild, UserGuild, Responses, Base
+from database import add_user
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
