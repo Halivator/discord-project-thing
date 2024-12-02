@@ -89,7 +89,7 @@ timetick = 15
 
 #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 #------------------------------------------------------------------------
-bot_status = cycle(["type in '!help' for help", "throwing LOTS of tomatoes", "Status Two", "Status Three", "Status Four"])
+bot_status = cycle(["type in '!help' for help", "throwing LOTS of tomatoes", "stealing your lunch money", "Status Three", "Status Four"])
 
 @tasks.loop(seconds=timetick)
 async def change_status():

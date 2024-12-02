@@ -38,4 +38,4 @@ class Garden(Base):
 class Wallet(Base): 
     __tablename__ = 'wallets'
 
-    user_id = Column(String)
+    user_id = Column(String, primary_key=True)
