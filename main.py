@@ -89,7 +89,6 @@ bot = MyClient(command_prefix='!',log_handler=handler,log_level=logging.DEBUG,in
 
 #client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
 
-#bot.application_id(APP_ID)
 
 #tree = app_commands.CommandTree(bot)
 #
@@ -178,46 +177,6 @@ async def on_ready():       #Q# - on_ready(), on_message() is an example of an e
 
 
 
-
-
-# https://dev.to/mannu/4slash-commands-in-discordpy-ofl
-##```python
-#@bot.tree.command(name="homie",description="tell me all of your commands and app commands")
-#async def slash_command(interaction:discord.Interaction):
-#    a = []
-#    b = []
-#    # Remove by value
-#    #a.remove("banana")  
-#
-#    # Remove by index
-#    #val = a.pop(1)
-#    #print(val)
-#    
-#    for filename in os.listdir("./cogs"):
-#        if filename.endswith(".py"):
-#            namer = f"{filename[:-3]}"
-#            cog = bot.get_cog(namer)
-#            commands = cog.get_commands()
-#            appcommands = cog.get_app_commands()
-#            listeners = cog.get_listeners()
-#            co = [c.name for c in commands]
-#            ac = [a.name for a in appcommands]
-#            li = [l.name for l in listeners]
-#            cogresult = f"\ncog: {namer}.py\n commands: {co}\n app commands (use \' / \'): {ac}\n listeners: {li}\n------"
-#            print(cogresult)
-#            a.append(cogresult)
-#    #temp = bot.tree.get_commands()  # guild = MY_GUILD, type=)
-#    ##temp2 = bot.get_commands()
-#    #for c in temp:
-#    #    result = f"\n- ```{c.name}```"
-#    #    b.append(result)
-#    #ti = [c.name for c in temp]
-#    c = f"Loaded from Cogs: {a}\nLoaded from command tree: {b}\n------"
-#    
-#    print(c)
-#    await interaction.response.send_message(c)
-
-
 # WORKS
 @bot.tree.command(name="hello", description="Says hello!")
 async def hello(interaction: discord.Interaction):
@@ -262,17 +221,6 @@ async def add(interaction: discord.Interaction, first_value: int, second_value: 
 
 
 
-"""
-# The rename decorator allows us to change the display of the parameter on Discord.
-# In this example, even though we use `text_to_send` in the code, the client will use `text` instead.
-# Note that other decorators will still refer to it as `text_to_send` in the code.
-@bot.tree.command()
-@app_commands.rename(text_to_send='text')
-@app_commands.describe(text_to_send='Text to send in the current channel')
-async def send(interaction: discord.Interaction, text_to_send: str):
-    ###""Sends the text into the current channel.""
-    await interaction.response.send_message(text_to_send)
-"""
 
 
 
