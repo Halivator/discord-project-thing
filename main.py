@@ -21,9 +21,6 @@ import os           #Q# os library is only used to get the TOKEN from the .env f
 from data_models import User, Guild, UserGuild, Responses, Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from fastapi import FastAPI, HTTPException
-
-app = FastAPI(); #E create instance of FastAPI class
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -38,7 +35,6 @@ engine = create_engine("sqlite:///Bot.db") #E - will load in if the db file is i
 Base.metadata.create_all(engine)
 
 #slash commands instead of old! commands
-
 class MyClient(commands.Bot):
     def __init__(self, *, intents: discord.Intents):
         super().__init__(command_prefix=['$!'],intents= intents) #intents)
@@ -62,13 +58,10 @@ class MyClient(commands.Bot):
         await self.tree.sync(guild=MY_GUILD)
 
 
-
-
 intents = discord.Intents.default() #all() #.default()
 # set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
 intents.message_content = True
 intents.presences = True
-
 
 #client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
 
@@ -86,7 +79,6 @@ bot = MyClient(intents=intents) #command_prefix=['$!'],      # https://discordpy
 timetick = 15
 
 #------------------------------------------------------------------------
-
 #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 #------------------------------------------------------------------------
 bot_status = cycle(["type in '!help' for help", "throwing LOTS of tomatoes", "stealing your lunch money", "Status Three", "Status Four"])
@@ -187,9 +179,6 @@ async def cogchk2(interaction: discord.Interaction):
     print(f"commands: {result} \n app commands (use \'/\'): {result2}")
     await interaction.response.send_message(f"commands: {result} \n app commands (use \'\\\'): {result2}")
 
-
-
-
 @bot.tree.command()
 @app_commands.describe(
     first_value='The first value you want to add something to',
@@ -239,23 +228,12 @@ async def load():
                 #print(f"{filename[:-3]} is loaded")    # will be placed inside the cog
     #await bot.tree.sync(guild=MY_GUILD)#guild=discord.Object(id=Your guild id))
 
-
 async def main():
     async with bot:
         #bot.setup_hook = load()
         await load()
         #await on_ready(bot)
         await bot.start(TOKEN)   # replaces client.run(TOKEN)
-
-
-#E - Used to resolve traceback loop - https://makubob.medium.com/combining-fastapi-and-discord-py-9aad07a5cfb6
-async def run(): 
-    try: 
-        await bot.start(TOKEN)
-    except KeyboardInterrupt: 
-        await bot.logout()
-
-asyncio.create_task(run())
 
 
 #client.run(os.getenv(TOKEN))      #Q# make sure that a .env file containing "TOKEN="{the_discord_bot_token}"" is in your project root directory
