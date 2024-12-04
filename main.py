@@ -18,6 +18,7 @@ from itertools import cycle
 import asyncio
 import random
 import os           #Q# os library is only used to get the TOKEN from the .env file
+import aiosqlite
 from data_models import User, Guild, UserGuild, Responses, Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -31,8 +32,10 @@ APP_ID = os.getenv("APPLICATION_ID")
 MY_GUILD = discord.Object(id=1182049728058380409)
 
 #E Database Setup - for loading database into project
-engine = create_engine("sqlite:///Bot.db") #E - will load in if the db file is in the same folder as project
-Base.metadata.create_all(engine)
+DATABASE_FILE = "Bot.db"
+async def db_connection(): 
+    async with aiosqlite.connect(DATABASE_FILE) as db: 
+        pass
 
 #slash commands instead of old! commands
 class MyClient(commands.Bot):
@@ -97,6 +100,7 @@ async def change_status():
 async def on_ready():       #Q# - on_ready(), on_message() is an example of an event callback, aka when something happens
     print('We have logged in as {0.user}'.format(bot))
     print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    await db_connection() #E - when the bot loads up, connect to the database
     print(f"Cycle timer tick has been set to {timetick}")
     change_status.start()                #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 ##    await bot.tree.sync(guild=MY_GUILD) #guild=discord.Object(id=Your guild id))
