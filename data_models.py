@@ -20,6 +20,6 @@ class Responses(Base):
 class Wallet(Base): 
     __tablename__ = 'wallets'
 
-    user_id = Column(String, primary_key=True), 
-    balance = Column(Integer), 
+    user_id = Column(String, primary_key=True)
+    balance = Column(Integer)
     number_of_tomatoes = Column(Integer)
