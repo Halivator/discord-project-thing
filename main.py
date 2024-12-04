@@ -8,6 +8,9 @@
 
 #############################################################################
 
+from base import *
+from modules import Database
+
 from dotenv import load_dotenv
 import discord 
 from discord import app_commands
@@ -15,34 +18,32 @@ from discord.ext import commands, tasks
 
 from itertools import cycle
 #import mylib
-import aiofiles
+import aiofiles, aiofiles.os
 import logging
 import logging.handlers
 import asyncio
 import random
+from pycolorise.colors import *
+
 import os           #Q# os library is only used to get the TOKEN from the .env file
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
 
-APP_ID = os.getenv("APPLICATION_ID")
-#APPLICATION_ID="1305627246022627359"
-T_GUILD = os.getenv("TEST_GUILD")
-t_id = int(T_GUILD)
-MY_GUILD = discord.Object(id=t_id)
+    
+
 
 logger = logging.getLogger(__name__)
-
-#slash commands instead of old! commands ----------
-
-
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
 
-
+#--------------------------------------------------
 class MyClient(commands.Bot):
+    """Class object for the bot"""
     def __init__(self, command_prefix, log_handler, log_level, *, intents: discord.Intents):
         super().__init__(command_prefix=command_prefix, log_handler=log_handler, log_level=log_level, intents= intents) #intents)
 
+        # vv from modules import Database
+        self.db = Database(Auth.FILENAME)
+        
         # A CommandTree is a special type that holds all the application command
         # state required to make it work. This is a separate class because it
         # allows all the extra state to be opt-in.
@@ -53,15 +54,22 @@ class MyClient(commands.Bot):
 
         #self.tree = app_commands.CommandTree(self)
 
+
     # In this basic example, we just synchronize the app commands to one guild.
     # Instead of specifying a guild to every command, we copy over our global commands instead.
     # By doing so, we don't have to wait up to an hour until they are shown to the end-user.
     async def setup_hook(self):
         # This copies the global commands over to your guild.
-        self.tree.copy_global_to(guild=MY_GUILD)
-        await self.tree.sync(guild=MY_GUILD)
+        if (Auth.MY_GUILD == ""):
+            self.tree.copy_global_to()
+            await self.tree.sync()
+        else:
+            self.tree.copy_global_to(guild=Auth.MY_GUILD)
+            await self.tree.sync(guild=Auth.MY_GUILD)
 
-
+    
+   
+#--------------------------------------------------------------
 
 
 
@@ -84,29 +92,30 @@ class MyClient(commands.Bot):
 # set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
 intents = discord.Intents.default() #all() #.default()
 intents.message_content = True
-bot = MyClient(command_prefix='!',log_handler=handler,log_level=logging.DEBUG,intents=intents) #command_prefix=['$!'],      # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
+bot = MyClient(command_prefix=f'{Auth.COMMAND_PREFIX}',log_handler=handler,log_level=logging.DEBUG,intents=intents) #command_prefix=['$!'],      # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
 
 
 #client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
 
 
-#tree = app_commands.CommandTree(bot)
-#
-#
-# HERE https://stackoverflow.com/questions/71165431/how-do-i-make-a-working-slash-command-in-discord-py
-#
-
-#Q# More about @client.events  :     https://discordpy.readthedocs.io/en/latest/api.html#discord.Client.event
-
-timetick = 15
 
 #------------------------------------------------------------------------
 
 #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 #------------------------------------------------------------------------
-bot_status = cycle(["type in '___' for help", "Status One", "Status Two", "Status Three", "Status Four"])
+bot_status = cycle([
+    f"try {Auth.COMMAND_PREFIX}help",
+    f"Throwing tomatoes ({Auth.COMMAND_PREFIX}help)",
+    f"Shut up, nerd ({Auth.COMMAND_PREFIX}help)",
+    f"Cyberbullying Children ({Auth.COMMAND_PREFIX}help)",
+    f"there's no //j here! ({Auth.COMMAND_PREFIX}help)",
+    f"developer online: Quinn ({Auth.COMMAND_PREFIX}help)"
+    ])
+"""List of statuses to cycle through"""
 
-@tasks.loop(seconds=timetick)
+
+
+@tasks.loop(seconds = Util.timetick)
 async def change_status():
     #print('{bot_status}'.format)
     next_activity = next(bot_status)
@@ -126,7 +135,7 @@ async def change_status():
 async def on_ready():       #Q# - on_ready(), on_message() is an example of an event callback, aka when something happens
     print('We have logged in as {0.user}'.format(bot))
     print(f'Logged in as {bot.user} (ID: {bot.user.id})')
-    print(f"Cycle timer tick has been set to {timetick}")
+    print(f"Cycle timer tick has been set to {Util.timetick}")
     change_status.start()                #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 ##    await bot.tree.sync(guild=MY_GUILD) #guild=discord.Object(id=Your guild id))
     print("Ready!")
@@ -273,20 +282,45 @@ async def get_username(interaction: discord.Interaction):
 
 
 
-
+# would ideally be merged into the MyClient class
 async def load():
+    """
+    Acts as MyClient()'s `async def on_ready(self)`.
+    
+    - Removes default !help
+    - Loads cogs
+    - awaits db.[TABLE_NAME].create_table()
+    """
     bot.remove_command('help')
     
-    for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
-            extension = f"cogs.{filename[:-3]}"
-            await bot.load_extension(extension)      # [:-3] is for string splicing
-                #print(f"{filename[:-3]} is loaded")    # will be placed inside the cog
+    #for filename in os.listdir("./cogs"):
+    #    if filename.endswith(".py"):
+    #        extension = f"cogs.{filename[:-3]}"
+    #        await bot.load_extension(extension)      # [:-3] is for string splicing
+    #            #print(f"{filename[:-3]} is loaded")    # will be placed inside the cog
     #await bot.tree.sync(guild=MY_GUILD)#guild=discord.Object(id=Your guild id))
+    print(Purple("\nLoading Cogs:"))
+    for file in os.listdir("./cogs"):
+        if file.endswith(".py"):
+            filename = file[:-3]
+            try:
+                await bot.load_extension(f"cogs.{filename}") #self.load
+                print(Blue(f"- {filename} ✅ "))
+            except:
+                print(Blue(f"- {filename} ❌ "))
+    ####  HERE  ######
+    await bot.db.bank.create_table()
+    await bot.db.inv.create_table()
+    await bot.db.resp.create_table()
+    
+    #print(Cyan("Created/modified tables successfully"))
 
 
 async def main():
     """Main function."""
+    # create a directory
+    await aiofiles.os.makedirs('logs', exist_ok=True)
+    
     # LOGGING (https://medium.com/@thomaschaigneau.ai/building-and-launching-your-discord-bot-a-step-by-step-guide-f803f7943d33)
     # https://docs.python.org/3/library/logging.html#module-logging
     # https://discordpy.readthedocs.io/en/latest/logging.html
@@ -312,7 +346,7 @@ async def main():
         #bot.setup_hook = load()
         await load()
         #await on_ready(bot)
-        await bot.start(TOKEN)   # replaces client.run(TOKEN)
+        await bot.start(Auth.TOKEN)   # replaces client.run(TOKEN)
         
 
 

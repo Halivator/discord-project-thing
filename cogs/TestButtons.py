@@ -23,7 +23,6 @@ class FarmersMarketCog(commands.Cog):
   def __init__(self, bot):     #bot
     self.bot = bot          #self.bot = bot
 
-
   @commands.Cog.listener()    # events use this decorator
   async def on_ready(self):
     print(f"{__name__} is ready!")
