@@ -5,7 +5,6 @@
 
 #Q# NOTE: 11/11-Q: tutorial followed for initial code setup below:  (planning to remove some of the comment annotations at a later date)
 # https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
-
 #############################################################################
 
 from dotenv import load_dotenv
@@ -15,13 +14,10 @@ from discord.ext import commands, tasks
 
 from itertools import cycle
 
-import asyncio
 import random
-import os           #Q# os library is only used to get the TOKEN from the .env file
-import aiosqlite
-from data_models import User, Guild, UserGuild, Responses, Base
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+import os #Q# os library is only used to get the TOKEN from the .env file
+from data_models import UserGuild, Responses, Wallet, Base, async_session
+from database_operations import add_to_userguild, get_from_userguild, update_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_from_user_wallet
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -30,12 +26,6 @@ APP_ID = os.getenv("APPLICATION_ID")
 #APPLICATION_ID="1305627246022627359"
 
 MY_GUILD = discord.Object(id=1182049728058380409)
-
-#E Database Setup - for loading database into project
-DATABASE_FILE = "Bot.db"
-async def db_connection(): 
-    async with aiosqlite.connect(DATABASE_FILE) as db: 
-        pass
 
 #slash commands instead of old! commands
 class MyClient(commands.Bot):
@@ -75,12 +65,10 @@ bot = MyClient(intents=intents) #command_prefix=['$!'],      # https://discordpy
 #
 #
 # HERE https://stackoverflow.com/questions/71165431/how-do-i-make-a-working-slash-command-in-discord-py
-#
 
 #Q# More about @client.events  :     https://discordpy.readthedocs.io/en/latest/api.html#discord.Client.event
 
 timetick = 15
-
 #------------------------------------------------------------------------
 #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 #------------------------------------------------------------------------
@@ -93,14 +81,12 @@ async def change_status():
     print(f"changing activity now to \'{next_activity}\'")
     await bot.change_presence(status=discord.Status.idle, activity=discord.Game(next_activity))
 
-
 #------------------------------------------------------------------------
 
 @bot.event
 async def on_ready():       #Q# - on_ready(), on_message() is an example of an event callback, aka when something happens
     print('We have logged in as {0.user}'.format(bot))
     print(f'Logged in as {bot.user} (ID: {bot.user.id})')
-    await db_connection() #E - when the bot loads up, connect to the database
     print(f"Cycle timer tick has been set to {timetick}")
     change_status.start()                #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 ##    await bot.tree.sync(guild=MY_GUILD) #guild=discord.Object(id=Your guild id))
@@ -125,12 +111,6 @@ async def on_message(message):
 #async def on_message(message):
 #    await bot.process_commands(message)
 #    print(message.content)
-
-
-
-
-
-
 
 # Add the guild ids in which the slash command will appear.
 # If it should be in all, remove the argument, but note that
@@ -203,8 +183,6 @@ async def send(interaction: discord.Interaction, text_to_send: str):
     """Sends the text into the current channel."""
     await interaction.response.send_message(text_to_send)
 
-
-
 @bot.tree.command(name="other_8ball", description="Says hello!")
 async def other_magic_eightball(interaction: discord.Interaction, question: str):
     with open(".responses.txt", "r") as f:        # "r" = read mode   
@@ -213,8 +191,6 @@ async def other_magic_eightball(interaction: discord.Interaction, question: str)
     
     await interaction.response.send_message(f"The answer to \"{question}\" is this: {response}")
 
-
-
 @commands.command(name='8ball')
 async def magic_eightball(ctx, *, question):
     with open("discord-project-thing/responses.txt", "r") as f:        # "r" = read mode   
@@ -222,7 +198,6 @@ async def magic_eightball(ctx, *, question):
         response = random.choice(random_responses)
     
     await ctx.send(response)
-
 
 async def load():
     for filename in os.listdir("./cogs"):
@@ -238,6 +213,7 @@ async def main():
         await load()
         #await on_ready(bot)
         await bot.start(TOKEN)   # replaces client.run(TOKEN)
+        await add_to_userguild(user_id=1, guild_id=123, guild_name="GUILD OF SADNESS")
 
 
 #client.run(os.getenv(TOKEN))      #Q# make sure that a .env file containing "TOKEN="{the_discord_bot_token}"" is in your project root directory
