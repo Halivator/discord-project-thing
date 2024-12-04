@@ -3,8 +3,10 @@
 import discord
 
 from discord.ext import commands
+from discord import app_commands
 import logging, logging.handlers
 import random
+import asyncio
 logger = logging.getLogger(__name__)
 
 
@@ -128,9 +130,9 @@ class Responses(commands.Cog):
 
 
 
-    @commands.command(usage="<item_name*: string>")
+    @commands.hybrid_command(usage="<item_name*: string>", with_app_command=True)
     @commands.guild_only()
-    async def addnewdetect(self, ctx, *, detect_phrase: str, output_line: str):
+    async def addnewdetect(self, ctx: commands.Context, detect_phrase: str, output_line: str):
         guild = ctx.guild
         await self.resp.open_resp(guild)
         #item_name.lower()
@@ -145,13 +147,15 @@ class Responses(commands.Cog):
 #                    return await ctx.reply(f"You don't have enough money to buy {item['name']}",
 #                                           mention_author=False)
 
-        result = await self.inv.create_resp(guild, detect_phrase, output_line)
+        result = await self.resp.create_resp(guild, detect_phrase, output_line)
         #await self.bank.update_acc(user, -item["cost"])
         
+        
+        await ctx.defer()
+        await asyncio.sleep(5)
         return await ctx.reply(f"Added a new response: detects[{result[2]}] | outputs[{result[3]}] | Number of Responses for this guild: {result[0]}", mention_author=False)
 
         
-        return await ctx.reply(f"end of method")
 #
 #    @commands.command(usage="<item_name*: string>")
 #    async def addgif(self, ctx, *, item_name: str):
