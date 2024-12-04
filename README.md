@@ -4,13 +4,7 @@ ideas so far:
 
     - Conomy
     - tomatoTomatoTomato
-    - cyber bullying children
-    - banning 
-
-
-
-Buh.
-
+    - Pandemonium
 
 Discord Bot must:
 
