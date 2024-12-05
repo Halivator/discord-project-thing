@@ -25,10 +25,13 @@ async def add_to_userguild(user_id: int, guild_id: int, guild_name: str):
 #Get by a user's ID
 #Review these (get wallet) - not sure it will work exactly the same was as for P1
 async def get_from_userguild(user_id: int): 
-    async with async_session() as db_session: 
-        userguild_to_get = await db_session.query(UserGuild).filter(UserGuild.user_id == user_id).first()
-
-        return userguild_to_get
+    try: #Adding exception handling for logging just in case this doesn't work as expected
+        async with async_session() as db_session: 
+            userguild_to_get = await db_session.query(UserGuild).filter(UserGuild.user_id == user_id).first()
+            return userguild_to_get
+    except Exception as e: #Similar to try-catch in C#
+        print("User, {user_id}, is not found in any servers. Cannot be retrieved.")
+        return None
 
 #DELETE 
 async def delete_from_userguild(user_id: int): 
@@ -54,10 +57,13 @@ async def create_user_wallet(user_id: int, balance: int, number_of_tomatoes: int
 #READ
 #Get by a user's ID
 async def get_user_wallet(user_id: int): 
-    async with async_session() as db_session: 
-        wallet_to_get = await db_session.query(Wallet).filter(Wallet.user_id == user_id).first()
-
-        return wallet_to_get
+    try: 
+        async with async_session() as db_session: 
+            wallet_to_get = await db_session.query(Wallet).filter(Wallet.user_id == user_id).first()
+            return wallet_to_get
+    except Exception as e: 
+        print("Wallet for user {user_id} cannot be retrieved: it either doesn't exsist, or entry was invalid.")
+        return None
 
 #UPDATE
 async def update_user_wallet(user_id: int, updatedWallet:WalletModel):
