@@ -51,7 +51,7 @@ class Responses(commands.Cog):
     @commands.Cog.listener("on_message")    # events use this decorator
     @commands.guild_only()
     async def responder(self, message):
-        print(f'{message.author.id} | {message.channel.name} | {message.content}')
+        print(f'{message.author.name} | {message.channel.name} | {message.content}')
         
         command_container = []
         # iterating through cogs
@@ -133,6 +133,7 @@ class Responses(commands.Cog):
     @commands.hybrid_command(usage="<item_name*: string>", with_app_command=True)
     @commands.guild_only()
     async def addnewdetect(self, ctx: commands.Context, detect_phrase: str, output_line: str):
+        """currently broken"""
         guild = ctx.guild
         await self.resp.open_resp(guild)
         #item_name.lower()
@@ -151,9 +152,57 @@ class Responses(commands.Cog):
         #await self.bank.update_acc(user, -item["cost"])
         
         
+
+        
+        
         await ctx.defer()
         await asyncio.sleep(5)
         return await ctx.reply(f"Added a new response: detects[{result[2]}] | outputs[{result[3]}] | Number of Responses for this guild: {result[0]}", mention_author=False)
+
+
+
+
+
+
+    @commands.hybrid_command(usage="<item_name*: string>", with_app_command=True)
+    @commands.guild_only()
+    async def editdetect(self, ctx: commands.Context, detect_phrase: str, output_line: str, new_detect_phrase: str, new_output_line: str):
+        guild = ctx.guild
+        await self.resp.open_resp(guild)
+        #item_name.lower()
+        #if detect_phrase not in [item["name"].lower() for item in self.inv.shop_items]:
+        #    return await ctx.reply(f"Theirs no item named `{item_name}`", mention_author=False)
+
+    #    resps = await self.resp.get_resp(guild)
+#        for respo in resps:
+#            if item_name == item["name"].lower():
+#
+#                if users[1] < item["cost"]:
+#                    return await ctx.reply(f"You don't have enough money to buy {item['name']}",
+#                                           mention_author=False)
+
+        result = await self.resp.s_update_resp(guild, detect_phrase, output_line, new_detect_phrase, new_output_line)
+        #await self.bank.update_acc(user, -item["cost"])
+        
+        
+       # options = await self.resp.oget_resp(guild, new_detect_phrase, new_output_line)
+            
+            
+       # print(f'{__name__}: [options]: [PRINTING LOOP...]')
+        #for row in options:
+        #    print(f"\t- responseID[0]: {row[0]}, guildID[1]: {row[1]}, message_to_detect[2]: {row[2]}, output[3]: {row[3]}")  # Replace with actual columns
+        #print(f'{__name__}: [options]: [END LOOP...]')
+
+
+        
+        await ctx.defer()
+        await asyncio.sleep(5)
+        return await ctx.reply(f"Edited a response", mention_author=False)
+
+
+
+
+
 
         
 #

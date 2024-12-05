@@ -98,6 +98,19 @@ class Responses:
         )
         
         
+    async def oget_resp(self, guild: discord.Guild, detect: str, output: str) -> Optional[Any]:
+        """
+        OVERLOAD: get a single output based on the guild and the responseID. 
+        
+        NOTE: Uses `one` for now.
+        """
+        return await self._db.execute(
+            f"SELECT * FROM `{TABLE_NAME}` WHERE guildID = ? AND message_to_detect = ? AND output = ?",
+            (guild.id, detect, output), fetch="one"
+        )
+        
+        
+        
     async def nget_resp(self, guild: discord.Guild, respNum: int) -> Optional[Any]:
         """
         OVERLOAD: get a single output based on the guild and the responseID. 
@@ -113,7 +126,7 @@ class Responses:
         """
         OVERLOAD: get outputs based on the guild and the detect string. 
         
-        NOTE: Uses `one` for now.
+        NOTE: Uses `all` for now.
         """
         return await self._db.execute(
             f"SELECT * FROM `{TABLE_NAME}` WHERE guildID = ? AND message_to_detect = ?",
@@ -175,6 +188,61 @@ class Responses:
 
 
 
+    async def s_update_resp(
+        self, guild: discord.Guild, phrase: str = "Nitro", saythis: str = "nerd", new_phrase: str = "Nitro", new_saythis: str = "nerd"
+    ) -> Optional[Any]:
+        """
+        Updates a field in the Responses Table
+        
+        -----
+        **Arguments:**
+        
+        - `self`
+        - `guild: discord.Guild`
+            - Used to get the guildID
+        - `respNum: int = 0`
+            - Used to choose the Response based on ResponseID (the other PK)
+            - Defaults to `0` for the first row, if not specified
+        - `mode: str`
+            - Chooses the column you want to change data in.
+            - `"output"` or `"message_to_detect"` are both valid options
+            - defaults to `"message_to_detect"`
+        - `change: str`
+            - Determines what you want to change the data field to.
+            - Defaults to `Nitro`
+        """
+        conn = await self._db.connect()
+        data = await self._db.execute(
+            f"SELECT * FROM `{TABLE_NAME}` WHERE guildID = ? AND message_to_detect = ? AND output = ?",
+            (guild.id, phrase, saythis), fetch="one", conn=conn
+        )
+        
+        temp = 0
+        
+        if data is not None:
+            print(f'\nDATA IS NOT NONE\n')
+            temp = data[0]
+            
+            await self._db.run(
+                f"UPDATE `{TABLE_NAME}` SET message_to_detect = ?, output = ? WHERE guildID = ? AND responseID = ?",
+                (new_phrase, new_saythis, guild.id, temp), conn=conn
+            )
+
+
+
+        line = await self._db.execute(
+            f"SELECT * FROM `{TABLE_NAME}` WHERE guildID = ? AND responseID = ?",
+            (guild.id, temp), fetch="one", conn=conn
+        )
+
+        await conn.close()
+        return line
+
+
+
+
+
+
     async def create_resp(
         self, guild: discord.Guild, phrase: str = "Nitro", saythis: str = "nerd"
     ) -> Optional[Any]:
@@ -217,7 +285,7 @@ class Responses:
             print(f'this response record already exists')
         
         line = await self._db.execute(
-            f"SELECT * FROM `{TABLE_NAME}` WHERE guildID = ? AND responseID = ?",
+            f"SELECT `guildID`, `responseID`, `message_to_detect`, `output` FROM `{TABLE_NAME}` WHERE guildID = ? AND responseID = ?",
             (guild.id, plus), fetch="one", conn=conn
         )
 
@@ -228,6 +296,13 @@ class Responses:
 
 
 
+    async def delete_detect_resp(self, guild: discord.Guild, detect: str) -> None:
+        await self._db.execute(f"DELETE FROM `{TABLE_NAME}` WHERE guildID = ? AND message_to_detect = ?", (guild.id,detect))
+        await self.open_resp(guild)
+
+    async def delete_output_resp(self, guild: discord.Guild, detect: str, output:str) -> None:
+        await self._db.execute(f"DELETE FROM `{TABLE_NAME}` WHERE guildID = ? AND message_to_detect = ? AND output = ?", (guild.id,detect,output))
+        await self.open_resp(guild)
 
 
 
