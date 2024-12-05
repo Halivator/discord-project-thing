@@ -8,6 +8,7 @@
 
 #############################################################################
 
+import aiofiles.os
 from dotenv import load_dotenv
 import discord 
 from discord import app_commands
@@ -18,7 +19,7 @@ from discord.ui import Button, View
 
 from itertools import cycle
 #import mylib
-#import aiofiles
+import aiofiles, aiofiles.os
 import logging
 import logging.handlers
 import asyncio
@@ -119,6 +120,7 @@ async def main():
     # LOGGING (https://medium.com/@thomaschaigneau.ai/building-and-launching-your-discord-bot-a-step-by-step-guide-f803f7943d33)
     # https://docs.python.org/3/library/logging.html#module-logging
     # https://discordpy.readthedocs.io/en/latest/logging.html
+    await aiofiles.os.makedirs('logs', exist_ok=True)
     logger = logging.getLogger('discord')
     logger.setLevel(logging.DEBUG)
     logging.getLogger('discord.http').setLevel(logging.INFO)
