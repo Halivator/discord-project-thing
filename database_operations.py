@@ -1,5 +1,6 @@
 #E - File for CRUD operations on Database & database data management
 #https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
+#https://medium.com/@shubhkarmanrathore/mastering-crud-operations-with-sqlalchemy-a-comprehensive-guide-a05cf70e5dea
 from data_models import UserGuild, Wallet, async_session
 from discord import HTTPException
 from pydantic import BaseModel
@@ -21,9 +22,11 @@ async def add_to_userguild(user_id: int, guild_id: int, guild_name: str):
         return new_userguild
 
 #READ 
+#Get by a user's ID
+#Review these (get wallet) - not sure it will work exactly the same was as for P1
 async def get_from_userguild(user_id: int): 
     async with async_session() as db_session: 
-        userguild_to_get = db_session.query(UserGuild).filter(UserGuild.user_id == user_id).first()
+        userguild_to_get = await db_session.query(UserGuild).filter(UserGuild.user_id == user_id).first()
 
         return userguild_to_get
 
@@ -49,8 +52,12 @@ async def create_user_wallet(user_id: int, balance: int, number_of_tomatoes: int
         return new_wallet
 
 #READ
-async def get_user_wallet(): ##model similarly to get_userguild
-    pass
+#Get by a user's ID
+async def get_user_wallet(user_id: int): 
+    async with async_session() as db_session: 
+        wallet_to_get = await db_session.query(Wallet).filter(Wallet.user_id == user_id).first()
+
+        return wallet_to_get
 
 #UPDATE
 async def update_user_wallet(user_id: int, updatedWallet:WalletModel):
