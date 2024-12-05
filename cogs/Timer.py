@@ -41,13 +41,13 @@ class TimerCog(commands.Cog):
         """Prevent users on cooldown from running other commands."""
         user = ctx.author
 
+        # Check if the user is on cooldown
         if user.id in self.cooldowns:
             remaining = self.cooldowns[user.id] - discord.utils.utcnow().timestamp()
             if remaining > 0:
                 await ctx.send(f"You're on cooldown! Try again in {int(remaining)} seconds.")
-                ctx.command.reset_cooldown(ctx)  # Prevent command execution
-                raise commands.CommandError("User on cooldown.")
+                return  # Stop further command execution
 
 # Setup function for the cog
-def setup(bot):
-    bot.add_cog(TimerCog(bot))
+async def setup(bot):
+    await bot.add_cog(TimerCog(bot))
