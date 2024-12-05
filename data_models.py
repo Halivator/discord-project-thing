@@ -2,12 +2,18 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+#https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
 
 #E Database Setup - for loading database into project
-DATABASE_PATH = "sqlite+aiosqlite:///Bot.db"
+DATABASE_PATH = "sqlite+aiosqlite:///Bot.db" #Relative path
 
 engine = create_async_engine(DATABASE_PATH, echo=True)
-async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+async_session = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+
+#Function to create database & its tables and get it running
+async def initialize_db(): 
+    async with engine.begin() as connection: 
+        await connection.run_sync(Base.metadata.create_all)
 
 class Base(DeclarativeBase): 
     pass
@@ -16,7 +22,8 @@ class UserGuild(Base):
     __tablename__ = 'userguilds'
 
     user_id = Column(Integer, primary_key=True)
-    guild_id = Column(Integer, primary_key=True)
+    guild_id = Column(Integer)
+    guild_name = Column(String)
 
 class Responses(Base): 
     __tablename__ = 'responses'

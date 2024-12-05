@@ -15,11 +15,18 @@ from discord.ext import commands, tasks
 from itertools import cycle
 
 import random
+import aiofiles, aiofiles.os
+import logging
+import logging.handlers
 import os #Q# os library is only used to get the TOKEN from the .env file
-from data_models import UserGuild, Responses, Wallet, Base, async_session
+import asyncio
+from data_models import UserGuild, Responses, Wallet, Base, async_session, initialize_db
 from database_operations import add_to_userguild, get_from_userguild, update_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_from_user_wallet
 
 load_dotenv()
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 APP_ID = os.getenv("APPLICATION_ID")
@@ -124,10 +131,6 @@ async def on_message(message):
 #async def first_command(interaction: discord.Interaction):
 #    await interaction.response.send_message("Hello! I am BraxCord")
 
-
-
-
-
 # https://dev.to/mannu/4slash-commands-in-discordpy-ofl
 ##```python
 @bot.tree.command(name="mannu",description="Mannu is a good boy")
@@ -140,7 +143,6 @@ async def hello(interaction: discord.Interaction):
     """Says hello!"""
     await interaction.response.send_message("Hello there!")
 
-
 @bot.tree.command(name="cogchk", description="Checks the cog commands!")
 async def cogchk(interaction: discord.Interaction):
     """Check the cog commands!"""
@@ -149,8 +151,6 @@ async def cogchk(interaction: discord.Interaction):
     result = [c.name for c in commands]
     print(result)
     await interaction.response.send_message(f"{result}")
-
-
 
 @bot.tree.command(name="cogchk2", description="Checks the cog commands! Again! Also with app_commands")
 async def cogchk2(interaction: discord.Interaction):
@@ -208,13 +208,37 @@ async def load():
     #await bot.tree.sync(guild=MY_GUILD)#guild=discord.Object(id=Your guild id))
 
 async def main():
+    """Main function."""
+    # create a directory
+    await aiofiles.os.makedirs('logs', exist_ok=True)
+    
+    # LOGGING (https://medium.com/@thomaschaigneau.ai/building-and-launching-your-discord-bot-a-step-by-step-guide-f803f7943d33)
+    # https://docs.python.org/3/library/logging.html#module-logging
+    # https://discordpy.readthedocs.io/en/latest/logging.html
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.DEBUG)
+    logging.getLogger('discord.http').setLevel(logging.INFO)
+
+    handler = logging.handlers.RotatingFileHandler(
+        filename= 'logs/discord.log',      #f"{os.getenv('DATABASE_VOLUME')}/discord.log",
+        encoding='utf-8',
+        maxBytes=32 * 1024 * 1024,  #32 MiB
+        backupCount=5,  # Rotate through 5 files
+    )
+    date_format = '%Y-%m-%d %H:%M:%S'
+    formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', date_format, style='{')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.info('Started')
+    # END LOGGING
+
     async with bot:
+        logger.info('running: main > _async with bot_')
+        await initialize_db()
         #bot.setup_hook = load()
         await load()
         #await on_ready(bot)
         await bot.start(TOKEN)   # replaces client.run(TOKEN)
-        await add_to_userguild(user_id=1, guild_id=123, guild_name="GUILD OF SADNESS")
-
-
-#client.run(os.getenv(TOKEN))      #Q# make sure that a .env file containing "TOKEN="{the_discord_bot_token}"" is in your project root directory
-#client.run(TOKEN)                   #Q# Solution found via: https://stackoverflow.com/a/63530919
+        
+asyncio.run(main())
+logger.info('Finished')
