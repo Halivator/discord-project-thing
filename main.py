@@ -21,7 +21,7 @@ import logging.handlers
 import os #Q# os library is only used to get the TOKEN from the .env file
 import asyncio
 from data_models import UserGuild, Responses, Wallet, Base, async_session, initialize_db
-from database_operations import add_to_userguild, get_from_userguild, update_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_from_user_wallet
+from database_operations import add_to_userguild, get_from_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_from_user_wallet
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -239,6 +239,6 @@ async def main():
         await load()
         #await on_ready(bot)
         await bot.start(TOKEN)   # replaces client.run(TOKEN)
-        
+
 asyncio.run(main())
 logger.info('Finished')

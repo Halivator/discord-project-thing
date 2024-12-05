@@ -1,6 +1,6 @@
 #E - File for CRUD operations on Database & database data management
 #https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
-from data_models import UserGuild, Wallet, Responses, Base, async_session
+from data_models import UserGuild, Wallet, async_session
 from discord import HTTPException
 from pydantic import BaseModel
 
@@ -66,7 +66,6 @@ async def update_user_wallet(user_id: int, updatedWallet:WalletModel):
 
         await db_session.commit() #commit the changes to DB 
         await db_session.refresh(wallet) #refresh the attributes of the updated user
-
 
 #DELETE
 async def delete_from_user_wallet(user_id: int): 
