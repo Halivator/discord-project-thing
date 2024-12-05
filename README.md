@@ -57,6 +57,7 @@ Discord Bot must:
     - *Complexity:* M
 	- *Functionality:* To sell tomatoes for in-game currency and to buy seeds
 	- *Impact on Community:* Provides users with a fun way to interact with in-game currency/items and continue making a profit.
+	- *In production, Farmer's Market feature has been combined with the garden*
 - **React to User Messages** *(contains a default list, can be customized by server administrators)*
 	- *Complexity:* L
 	- *Functionality:* If a user says a specific word provided by moderators OR keywords chosen by developers, the bot replies to them with the message contents in some form of media (text, images, video, gifs, etc.). 
@@ -67,6 +68,6 @@ Discord Bot must:
     - *Impact on Community:* Provides users with a way to interact with the rest of the game and see the reward of their time using the bot.
 
 
-
-------
-
+**TO-DO**
+-----------
+Test CRUD operations and implement them in main of BraxCord - working with Quinn on this 
