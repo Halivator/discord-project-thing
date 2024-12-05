@@ -100,7 +100,6 @@ async def on_ready():       #Q# - on_ready(), on_message() is an example of an e
     print("Ready!")
     #await client.tree.sync() #client.tree.sync()
 
-
 #@client.event
 @bot.event
 async def on_message(message):
@@ -113,6 +112,21 @@ async def on_message(message):
     await bot.process_commands(message)
     print(message.content)
 
+@bot.event
+#pre-defined function by discord to run when a bot is added to a server
+async def on_guild_join(guild: discord.Guild): 
+    for member in guild.members: #E - for each of the members in the guild 
+        if member.bot: #E - if the member is a BOT, skip to next block of code
+            continue 
+        try: 
+            await add_to_userguild (
+                user_id=member.id, 
+                guild_id=guild.id, 
+                guild_name=guild.name
+            )
+            print("Added user of {member.name} with ID {member.id} to UserGuild table for Guild: {guild.name}") #For logging/testing
+        except Exception: 
+            print("Could not add user {member.name} to UserGuild table") #For logging/testing
 
 #@bot.event
 #async def on_message(message):
@@ -198,6 +212,7 @@ async def magic_eightball(ctx, *, question):
         response = random.choice(random_responses)
     
     await ctx.send(response)
+
 
 async def load():
     for filename in os.listdir("./cogs"):

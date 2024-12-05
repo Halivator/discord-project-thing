@@ -30,7 +30,7 @@ async def get_from_userguild(user_id: int):
             userguild_to_get = await db_session.query(UserGuild).filter(UserGuild.user_id == user_id).first()
             return userguild_to_get
     except Exception as e: #Similar to try-catch in C#
-        print("User, {user_id}, is not found in any servers. Cannot be retrieved.")
+        print("User, {user_id}, is not found in any servers. Cannot be retrieved.") #Print to termimal
         return None
 
 #DELETE 
@@ -39,7 +39,7 @@ async def delete_from_userguild(user_id: int):
         userguild_to_delete = await db_session.get(UserGuild, user_id)
 
         if not userguild_to_delete: 
-            raise HTTPException(response="User guild relationship not found", status=400)
+            raise HTTPException(response="User guild relationship not found", status=400) #display to terminal 
         
         await db_session.delete(userguild_to_delete)
         await db_session.commit()
@@ -62,7 +62,7 @@ async def get_user_wallet(user_id: int):
             wallet_to_get = await db_session.query(Wallet).filter(Wallet.user_id == user_id).first()
             return wallet_to_get
     except Exception as e: 
-        print("Wallet for user {user_id} cannot be retrieved: it either doesn't exsist, or entry was invalid.")
+        print("Wallet for user {user_id} cannot be retrieved: it either doesn't exsist, or entry was invalid.") #print to terminal
         return None
 
 #UPDATE
@@ -71,7 +71,7 @@ async def update_user_wallet(user_id: int, updatedWallet:WalletModel):
         wallet = db_session.query(Wallet).filter(Wallet.user_id == user_id).first() #ensure the user ID matches an id in the db 
 
         if not wallet: 
-            raise HTTPException(response="Wallet not found, cannot update inventory", status=404)
+            raise HTTPException(response="Wallet not found, cannot update inventory", status=404) #display to terminal
     
     #assign each of the updated attributes 
         wallet.balance = updatedWallet.balance
@@ -86,7 +86,7 @@ async def delete_from_user_wallet(user_id: int):
         wallet_to_delete = await db_session.get(Wallet, user_id)
 
         if not wallet_to_delete: 
-            raise HTTPException(response = "User wallet not found, cannot be deleted", status=404)
+            raise HTTPException(response = "User wallet not found, cannot be deleted", status=404) #display to terminal
         
     await db_session.delete(wallet_to_delete)
     await db_session.commit() 
