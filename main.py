@@ -21,7 +21,7 @@ import logging.handlers
 import os #Q# os library is only used to get the TOKEN from the .env file
 import asyncio
 from data_models import UserGuild, Responses, Wallet, Base, async_session, initialize_db
-from database_operations import add_to_userguild, get_from_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_from_user_wallet
+from database_operations import add_to_userguild, get_from_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_user_wallet
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -139,6 +139,18 @@ async def on_guild_remove(guild: discord.Guild):
         print(f"Successfully removed records for {guild.name} : {guild.id} from UserGuilds") ##For logging & testing
     else: 
         print(f"Error removing records for {guild.name} : {guild.id} from UserGuilds")
+
+@bot.event 
+async def on_member_join(): 
+    """When a member joins the server, create their wallet (utilizes create_user_wallet)"""
+    pass 
+
+@bot.event 
+async def on_member_remove(): 
+    """When a member leaves the server, remove their wallet (utilizes delete_user_wallet)"""
+    pass
+
+@bot.event 
         
 #@bot.event
 #async def on_message(message):
@@ -225,6 +237,16 @@ async def magic_eightball(ctx, *, question):
     
     await ctx.send(response)
 
+@bot.command()
+async def wallet(ctx):
+    """Command to display balance and inventory of a user's wallet (utilizes get_user_wallet)"""
+    pass
+
+@bot.command() 
+@commands.has_permissions(administrator=True) #Only allow server admins to interact with this command 
+async def update_wallet_balance(): 
+    """Command to allow server admins to change a user's balance"""
+    pass
 
 async def load():
     for filename in os.listdir("./cogs"):

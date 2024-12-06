@@ -1,4 +1,4 @@
-#E - File to handle data models and database connection
+#Eli - File to handle data models and database connection
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
