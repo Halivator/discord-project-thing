@@ -37,7 +37,7 @@ MY_GUILD = discord.Object(id=1182049728058380409)
 #slash commands instead of old! commands
 class MyClient(commands.Bot):
     def __init__(self, *, intents: discord.Intents):
-        super().__init__(command_prefix=['$!'],intents= intents) #intents)
+        super().__init__(command_prefix=['!'],intents= intents) #intents)
 
         # A CommandTree is a special type that holds all the application command
         # state required to make it work. This is a separate class because it
@@ -62,6 +62,8 @@ intents = discord.Intents.default() #all() #.default()
 # set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
 intents.message_content = True
 intents.presences = True
+intents.guilds = True
+intents.members = True
 
 #client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
 
@@ -79,7 +81,7 @@ timetick = 15
 #------------------------------------------------------------------------
 #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 #------------------------------------------------------------------------
-bot_status = cycle(["type in '!help' for help", "throwing LOTS of tomatoes", "stealing your lunch money", "Status Three", "Status Four"])
+bot_status = cycle(["Throwing tomatoes (!help)", "Shut up, nerd (!help)", "Cyberbulling Children (!help)", "Taking your lunch money! (!help)", "Dev Online: Eli"])
 
 @tasks.loop(seconds=timetick)
 async def change_status():
@@ -114,19 +116,23 @@ async def on_message(message):
 
 @bot.event
 #pre-defined function by discord to run when a bot is added to a server
+#this primarily works with fresh servers that the bot has not been added to before
 async def on_guild_join(guild: discord.Guild): 
     for member in guild.members: #E - for each of the members in the guild 
-        if member.bot: #E - if the member is a BOT, skip to next block of code
+        if member.bot == True: #E - if the member is a BOT, drop down to next block of code
             continue 
         try: 
-            await add_to_userguild (
+            await add_to_userguild(
                 user_id=member.id, 
                 guild_id=guild.id, 
                 guild_name=guild.name
             )
-            print("Added user of {member.name} with ID {member.id} to UserGuild table for Guild: {guild.name}") #For logging/testing
+            print(f"Added user of {member.name} with ID {member.id} to UserGuild table for Guild: {guild.name}") #For logging/testing
         except Exception: 
-            print("Could not add user {member.name} to UserGuild table") #For logging/testing
+            print(f"Could not add user {member.name} to UserGuild table") #For logging/testing'''
+
+async def on_guild_remove(guild: discord.Guild): 
+    pass
 
 #@bot.event
 #async def on_message(message):
