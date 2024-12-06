@@ -131,9 +131,15 @@ async def on_guild_join(guild: discord.Guild):
         except Exception: 
             print(f"Could not add user {member.name} to UserGuild table") #For logging/testing'''
 
+@bot.event
 async def on_guild_remove(guild: discord.Guild): 
-    pass
+    removal_count = await delete_from_userguild(guild_id=guild.id) #Remove from UserGuild table where guild_ids match
 
+    if removal_count > 0: 
+        print(f"Successfully removed records for {guild.name} : {guild.id} from UserGuilds") ##For logging & testing
+    else: 
+        print(f"Error removing records for {guild.name} : {guild.id} from UserGuilds")
+        
 #@bot.event
 #async def on_message(message):
 #    await bot.process_commands(message)

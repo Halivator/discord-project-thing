@@ -4,6 +4,7 @@
 from data_models import UserGuild, Wallet, async_session
 from discord import HTTPException
 from pydantic import BaseModel
+from sqlalchemy import delete
 from sqlalchemy.future import select #-https://docs.sqlalchemy.org/en/14/core/future.html
 
 class WalletModel(BaseModel): 
@@ -38,16 +39,11 @@ async def get_from_userguild(user_id: int):
 async def delete_from_userguild(guild_id: int): 
     async with async_session() as db_session: 
         userguild_records_to_delete = await db_session.execute(
-            select(UserGuild).filter(UserGuild.guild_id == guild_id) #Select userguild records where guild_ids match
+            delete(UserGuild).filter(UserGuild.guild_id == guild_id) #Fetch and directly delete records with a matching guild_id
         )
-        userguild_records_to_delete = userguild_records_to_delete.all() #collect all records that match and store back into original variable
-
-        if not userguild_records_to_delete: #if the record is not in the database
-            raise HTTPException(response="User guild relationship not found", status=400) #display to terminal - web
-        
-        await db_session.delete(userguild_records_to_delete)
-        await db_session.commit() #commit transaction
-        return True
+       
+        await db_session.commit() #commit delete transaction
+        return userguild_records_to_delete.rowcount()
 
 #Set of CRUD operations for wallets table 
 #CREATE

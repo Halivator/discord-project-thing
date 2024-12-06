@@ -21,8 +21,9 @@ class Base(DeclarativeBase):
 class UserGuild(Base): 
     __tablename__ = 'userguilds'
 
+    #Forming composite key
     user_id = Column(Integer, primary_key=True)
-    guild_id = Column(Integer)
+    guild_id = Column(Integer, primary_key=True)
     guild_name = Column(String)
 
 class Responses(Base): 
