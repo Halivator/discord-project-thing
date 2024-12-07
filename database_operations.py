@@ -66,7 +66,7 @@ async def get_user_wallet(user_id: int):
             wallet_to_get = query_wallet.scalar_one_or_none() #https://docs.sqlalchemy.org/en/20/core/connections.html#sqlalchemy.engine.ScalarResult.one_or_none ; returns an object or an exception
             return wallet_to_get
     except Exception as e: 
-        print(f"Wallet for user {user_id} cannot be retrieved: it either doesn't exsist, or entry was invalid.") #print to terminal
+        print(f"Wallet for user {user_id} cannot be retrieved: it either doesn't exsist, or entry was invalid.\n\n[EXCEPTION]:\t{e}") #print to terminal
 
 #UPDATE
 async def update_user_wallet(user_id: int, updatedWallet:WalletModel):
