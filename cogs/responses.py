@@ -69,8 +69,21 @@ class Responses(commands.Cog):
 #        await ctx.reply(embed=em, mention_author=False)
 #
 
-
-
+    #TODO: ELI USE THIS AS REF
+    #@commands.Cog.listener("on_member_join")
+    #@commands.guild_only()
+    #async def make_wallet_on_join(self, member):
+    #    channel = member.guild.system_channel
+    #    if channel is not None:
+    #        await channel.send(f'Welcome {member.mention}.')
+    #    wallet_created = await create_user_wallet(user_id=member.id, initial_balance=0, starting_number_of_tomatoes=0)
+    #    if wallet_created: 
+    #        print(f"The wallet was successfully created for {member.name} : {member.id}") #Print to terminal, since this happens by default, user does not need to see this message
+    #    else: 
+    #        print(f"There was an error creating the wallet for {member.name} : {member.id}, or, a wallet already exists for this user")
+     
+     
+     
     @commands.Cog.listener("on_message")    # events use this decorator
     @commands.guild_only()
     async def responder(self, message):
