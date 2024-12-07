@@ -6,10 +6,11 @@ from discord import HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete
 from sqlalchemy.future import select #-https://docs.sqlalchemy.org/en/14/core/future.html
+from typing import Optional
 
 class WalletModel(BaseModel): 
-    balance: int
-    number_of_tomatoes: int
+    balance: Optional[int]
+    number_of_tomatoes: Optional[int]
 
     class Config: 
         orm_mode=True
@@ -43,7 +44,7 @@ async def delete_from_userguild(guild_id: int):
     async with async_session() as db_session: 
         userguild_records_to_delete = await db_session.execute(delete(UserGuild).filter(UserGuild.guild_id == guild_id)) #Fetch and directly delete records with a matching guild_id
         await db_session.commit() #commit delete transaction
-        return userguild_records_to_delete.rowcount()
+        return userguild_records_to_delete
 
 #Set of CRUD operations for wallets table 
 #CREATE
@@ -52,6 +53,7 @@ async def create_user_wallet(user_id: int, initial_balance: int = 0, starting_nu
     async with async_session() as db_session: 
         new_wallet = Wallet(user_id=user_id, balance=initial_balance, number_of_tomatoes=starting_number_of_tomatoes)
         db_session.add(new_wallet)
+
         await db_session.commit() 
         return new_wallet
 
@@ -69,17 +71,21 @@ async def get_user_wallet(user_id: int):
         print(f"Wallet for user {user_id} cannot be retrieved: it either doesn't exsist, or entry was invalid.") #print to terminal
 
 #UPDATE
-async def update_user_wallet(user_id: int, updatedWallet:WalletModel):
+#PORTME - Overhauled to work with async sqlalchemy
+async def update_user_wallet(user_id: int, updatedWallet: WalletModel):
      """Update the balance or number of tomatoes in user's wallet"""
      async with async_session() as db_session: 
-        wallet = db_session.query(Wallet).filter(Wallet.user_id == user_id).first() #ensure the user ID matches an id in the db 
+        wallet_to_query = await db_session.execute(select(Wallet).filter(Wallet.user_id == user_id)) #ensure the user ID matches an id in the db 
+        wallet = wallet_to_query.scalar_one_or_none() 
 
         if not wallet: 
-            raise HTTPException(response="Wallet not found, cannot update inventory", status=404) #display to terminal
+            print(f"Wallet for user {user_id} not found") #display to terminal
     
     #assign each of the updated attributes 
-        wallet.balance = updatedWallet.balance
-        wallet.number_of_tomatoes = updatedWallet.number_of_tomatoes
+        if updatedWallet.balance is not None: #If the balance isn't equivalent to the None type
+            wallet.balance = updatedWallet.balance #go ahead and update the balance 
+        if updatedWallet.number_of_tomatoes is not None: #If the number of tomatoes isn't equivalent to the None type
+            wallet.number_of_tomatoes = updatedWallet.number_of_tomatoes #go ahead and update the number of tomatoes
 
         await db_session.commit() #commit the changes to DB 
         await db_session.refresh(wallet) #refresh the attributes of the updated user

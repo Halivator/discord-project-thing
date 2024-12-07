@@ -20,8 +20,8 @@ import logging
 import logging.handlers
 import os #Q# os library is only used to get the TOKEN from the .env file
 import asyncio
-from data_models import UserGuild, Responses, Wallet, Base, async_session, initialize_db
-from database_operations import add_to_userguild, get_from_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_user_wallet
+from data_models import UserGuild, Responses, Wallet, Base, async_session, initialize_db 
+from database_operations import add_to_userguild, get_from_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_user_wallet, WalletModel
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -85,8 +85,7 @@ async def change_status():
     print(f"changing activity now to \'{next_activity}\'")
     await bot.change_presence(status=discord.Status.idle, activity=discord.Game(next_activity))
 
-#------------------------------------------------------------------------
-
+#-------------------------------------------------------------------------------------------
 @bot.event
 async def on_ready():       #Q# - on_ready(), on_message() is an example of an event callback, aka when something happens
     print('We have logged in as {0.user}'.format(bot))
@@ -97,7 +96,6 @@ async def on_ready():       #Q# - on_ready(), on_message() is an example of an e
     print("Ready!")
     #await client.tree.sync() #client.tree.sync()
 
-#@client.event
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -241,9 +239,9 @@ async def magic_eightball(ctx, *, question):
 
 
 #E# - https://chatgpt.com/share/6753dcab-f708-8007-ad20-126bc14bcd10 - Chatlog for help debugging and getting resources on using the context(ctx) object
-@bot.command(name='wallet', description="Allow user's to view their wallet's contents")
+@bot.command(name='wallet', description="Allow user's to view their wallet's contents") ##Utilizes get_user_wallet and create_user_wallet operations
 async def wallet(ctx):
-    """Command to display balance and inventory of a user's wallet (utilizes get_user_wallet & create_user_wallet)"""
+    """Command to display balance and inventory of a user's wallet"""
     """If a user is existing in the server but doesn't have a wallet, create one for them"""
     ##Attributes to create a wallet and address user
     user_id = ctx.author.id 
@@ -263,12 +261,31 @@ async def wallet(ctx):
         await ctx.send(f"💯 {name}, your wallet has successfully been created with a balance of ${initial_balance} and inventory of {initial_tomatoes} tomatoes")
 
 
-#TODO: Flesh out this bot command
-@bot.command(name='change_balance', description="Allows server admins to change balance of a user's wallet")
+#PORTME
+@bot.command(name='update_balance', description="Allows server administrators to change balance of a user's wallet")
 @commands.has_permissions(administrator=True) #Only allow server admins to interact with this command 
-async def update_wallet_balance(ctx): 
-    """Command to allow server admins to change a user's balance"""
-    pass
+async def update_wallet_balance(ctx, member: discord.Member, new_balance:int): 
+    """Update a user's wallet balance - for administrators only"""
+    try: 
+        updated_wallet = WalletModel(balance=new_balance, number_of_tomatoes=None)
+
+        await update_user_wallet(user_id = member.id, updatedWallet=updated_wallet)
+        await ctx.send(f"Successfully updated {member.name}'s balance to {new_balance} 💸") #Success message when user's balance has been updated to db 
+    except Exception as ex: 
+        await ctx.send(f"An error occurred while trying to update {member.name}'s balance: {str(ex)}") #otherwise display error message to discord
+
+#PORTME 
+@bot.command(name='update_tomatoes', description="Allow server administrators to change the number of tomatoes a user has in their wallet")
+@commands.has_permissions(administrator=True)
+async def update_user_tomatoes(ctx, member:discord.Member, new_tomato_balance:int):
+    """Update the number of tomatoes a user has in their inventory - for administrators only"""
+    try: 
+        updated_wallet = WalletModel(balance=None, number_of_tomatoes=new_tomato_balance)
+
+        await update_user_wallet(user_id=member.id, updatedWallet=updated_wallet)
+        await ctx.send(f"Successfully updated {member.name}'s tomato balance to {new_tomato_balance} 🍅") #Success message when user's tomato count has been updated to db
+    except Exception as ex: 
+        await ctx.send(f"An error occurred while trying to update {member.name}'s wallet: {str(ex)}") #Otherwise display error message to discord
 
 async def load():
     for filename in os.listdir("./cogs"):
