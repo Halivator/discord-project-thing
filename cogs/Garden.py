@@ -24,6 +24,9 @@ Session = sessionmaker(bind=engine)
 
 logger = logging.getLogger(__name__)
 
+display_exception = True
+
+
 class GardenCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -70,8 +73,10 @@ class GardenCog(commands.Cog):
                             ephemeral=True
                         )
             except Exception as e:
-                logger.error(f"Error processing interaction: {e}")
-                await interaction.followup.send("An error occurred. Please try again later.", ephemeral=True)
+                printme = ""
+                logger.error(f"[{__name__}]:\t\tError processing interaction: {e}")
+                if display_exception: printme = (f'\n`GardenCog.py`: `display_exception` `==` {display_exception}\n---\nException:\n>  {e}')
+                await interaction.followup.send(f"An error occurred. Please try again later.{printme}", ephemeral=True)
 
         # Define what happens when the "Water" button is clicked
         async def button2_callback(interaction: discord.Interaction):
@@ -91,12 +96,14 @@ class GardenCog(commands.Cog):
                         )
                     else:
                         await interaction.followup.send(
-                            "Error. {interaction.user.display_name} does not have a wallet.",
+                            f"Error. {interaction.user.display_name} does not have a wallet.",
                             ephemeral=True
                         )
             except Exception as e:
-                logger.error(f"Error processing interaction: {e}")
-                await interaction.followup.send("An error occurred. Please try again later.", ephemeral=True)
+                printme = ""
+                logger.error(f"[{__name__}]:\t\tError processing interaction: {e}")
+                if display_exception: printme = (f'\n`GardenCog.py`: `display_exception` `==` {display_exception}\n---\nException:\n>  {e}')
+                await interaction.followup.send(f"An error occurred. Please try again later.{printme}", ephemeral=True)
 
         # Assign the callbacks to the buttons
         button1.callback = button1_callback
