@@ -21,6 +21,13 @@ item_names = [item["name"] for item in shop_items]
 
 
 class Inventory:
+    """
+    Ported from Economy Bot to use as reference. found in `modules/inventory_funcs.py`
+    
+    Purpose is to set up the inventory tables within the database and also create a list of tuples that operates as the shop items
+    
+    eventual goal is to eventually retool it to work solely with a database file that admins can add items to for the farmers market
+    """
     def __init__(self, database: Database):
         self._db = database
 

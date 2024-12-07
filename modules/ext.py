@@ -5,7 +5,7 @@ from typing import Optional, Any, Tuple
 
 class Database:
     """
-    Class containing methods for interacting with a Database.
+    Class containing methods for interacting with a Database. found in `modules/ext.py`
     
     (Should hopefully take the place of SQLAlchemy for now)
     

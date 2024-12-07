@@ -309,8 +309,8 @@ async def load():
             except:
                 print(Blue(f"- {filename} ❌ "))
     ####  HERE  ######
-    await bot.db.bank.create_table()
-    await bot.db.inv.create_table()
+    #await bot.db.bank.create_table()
+    #await bot.db.inv.create_table()
     await bot.db.resp.create_table()
     
     #print(Cyan("Created/modified tables successfully"))

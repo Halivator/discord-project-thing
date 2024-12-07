@@ -14,6 +14,14 @@ columns = ["wallet", "bank"]  # You can add more Columns in it !
 
 
 class Bank:
+    """
+    Ported from Economy Bot to use as reference. found in `modules/bank_funcs.py`
+    
+    Purpose is to set up the bank tables within the database and that has columns `bank` and `wallet`
+    
+    eventual goal is to eventually retool it to be more suitable for the needs of BraxCord and the farmers market
+    """
+
     def __init__(self, database: Database):
         self._db = database
 
