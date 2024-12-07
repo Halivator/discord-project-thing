@@ -58,6 +58,7 @@ class GardenCog(commands.Cog):
                 with Session() as session:
                     user_id = str(interaction.user.id)
                     wallet = session.query(Wallet).filter_by(user_id=user_id).first()
+                    print(f'[{__name__}]:\t[wallet]:\t{wallet}')
 
                     if wallet:
                         wallet.number_of_tomatoes += random_plant
@@ -74,7 +75,7 @@ class GardenCog(commands.Cog):
                         )
             except Exception as e:
                 printme = ""
-                logger.error(f"[{__name__}]:\t\tError processing interaction: {e}")
+                logger.error(f"[{__name__}]:\n\tError processing interaction:\n\t{e}\n----[END ERROR]----")
                 if display_exception: printme = (f'\n`GardenCog.py`: `display_exception` `==` {display_exception}\n---\nException:\n>  {e}')
                 await interaction.followup.send(f"An error occurred. Please try again later.{printme}", ephemeral=True)
 
@@ -85,6 +86,7 @@ class GardenCog(commands.Cog):
                 with Session() as session:
                     user_id = str(interaction.user.id)
                     wallet = session.query(Wallet).filter_by(user_id=user_id).first()
+                    print(f'[{__name__}]:\t[wallet]:\t{wallet}')
 
                     if wallet:
                         wallet.number_of_tomatoes += random_water
@@ -101,7 +103,7 @@ class GardenCog(commands.Cog):
                         )
             except Exception as e:
                 printme = ""
-                logger.error(f"[{__name__}]:\t\tError processing interaction: {e}")
+                logger.error(f"[{__name__}]:\n\tError processing interaction:\n\t{e}\n----[END ERROR]----")
                 if display_exception: printme = (f'\n`GardenCog.py`: `display_exception` `==` {display_exception}\n---\nException:\n>  {e}')
                 await interaction.followup.send(f"An error occurred. Please try again later.{printme}", ephemeral=True)
 
@@ -115,8 +117,8 @@ class GardenCog(commands.Cog):
         view.add_item(button2)
 
         # Send Information to the logger and terminal
-        logger.info(f"GARDEN CALLED\n\tcontext: {ctx}")
-        print(f"GARDEN CALLED\n\tcontext: {ctx}")
+        logger.info(f"[{__name__}]:\tGARDEN CALLED\n\t\tcontext: {ctx}")
+        print(f"[{__name__}]:\tGARDEN CALLED\n\t\tcontext: {ctx}")
 
         # Send the message with the embed and buttons
         await ctx.send(embed=embed, view=view)
