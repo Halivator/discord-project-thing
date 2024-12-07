@@ -35,7 +35,7 @@ class Eightball(commands.Cog):
     #@commands.hybrid_command(name="baller", description="yet another 8ball", with_app_command=True)
     #@app_commands.describe(message="The question to ask")
     #async def baller(self, ctx: commands.Context, *, message: str):
-    #    async with aiofiles.open('responses.txt', mode='r') as f:
+    #    async with aiofiles.open('eightball_responses.txt', mode='r') as f:
     #        random_responses = await f.readlines()
     #        response = random.choice(random_responses)
     #    
@@ -48,7 +48,7 @@ class Eightball(commands.Cog):
     #
     #@commands.command()          # commands use this decorator
     #async def eightball(self, ctx, *, question):                      # when working with a cog, `self` goes before anything else in your #command
-    #    with open("responses.txt", "r") as f:        # "r" = read mode   
+    #    with open("eightball_responses.txt", "r") as f:        # "r" = read mode   
     #        random_responses = f.readlines()                    # file is being treated as a list
     #        response = random.choice(random_responses)
     #
@@ -72,7 +72,7 @@ class Eightball(commands.Cog):
     @app_commands.describe(message="The question to ask")
     async def newballer(self, ctx, *, message: str = None):
         lines = []
-        lines = await self.read_file_to_list('responses.txt')
+        lines = await self.read_file_to_list('eightball_responses.txt')
         response = random.choice(lines)
         if message is not None:
             response = f"The answer to \"{message}\" is this: {response}"
@@ -85,9 +85,9 @@ class Eightball(commands.Cog):
     @commands.hybrid_command(name="baller", description="yet another 8ball", with_app_command=True)
     @app_commands.describe(message="The question to ask")
     async def baller(self, ctx: commands.Context, *, message: str):
-        async with aiofiles.open('responses.txt', mode='r') as f:
+        async with aiofiles.open('eightball_responses.txt', mode='r') as f:
             lines = []
-            lines = await self.read_file_to_list('responses.txt')
+            lines = await self.read_file_to_list('eightball_responses.txt')
             response = random.choice(lines)
             if message is not None:
                 response = f"The answer to \"{message}\" is this: {response}"
