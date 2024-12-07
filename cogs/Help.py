@@ -221,7 +221,7 @@ class Help(commands.Cog):
                 # if cog not in a cog
                 # listing command if cog name is None and command isn't hidden
                 if not command.cog_name and not command.hidden:
-                    commands_desc += f'{command.name} - {command.help}\n'
+                    commands_desc += f'- **{command.name}** - {command.help}\n'
 
             # adding those commands to embed
             if commands_desc:

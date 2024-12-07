@@ -4,3 +4,5 @@ python-dotenv
 aiofiles
 asyncio
 pycolorise
+pydantic
+sqlalchemy

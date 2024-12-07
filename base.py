@@ -43,5 +43,5 @@ class Auth:
     FILENAME = os.getenv("FILENAME")
     DEV_ID = os.getenv("DEVELOPER_ID")
     """Determines the filename of the .db file"""
-
+    DEV_NAME = os.getenv("DEVELOPER_NAME")
 

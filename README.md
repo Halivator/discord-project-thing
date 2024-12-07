@@ -4,13 +4,7 @@ ideas so far:
 
     - Conomy
     - tomatoTomatoTomato
-    - cyber bullying children
-    - banning 
-
-
-
-Buh.
-
+    - Pandemonium
 
 Discord Bot must:
 
@@ -71,8 +65,22 @@ Discord Bot must:
 ------
 
 
+***BRANCHES***
+- Quinn
+  - *sql-database-integration*
+- Eli
+  - *database-creation* 
+
+
+
+
+
+
+
+----------
 
 **CURRENT BUGS/ISSUES:**
+----------------
 - Q- commands / command prefix does not work. on_message(message) logger shows that messages are being read, but they do not get seen as commands
 - Q- app_commands work. However, upon trying to access a local file (see: eightball commands), Discord error: "The application did not respond" occurs.
   - Q- How do we get console output for when these errors occur?
@@ -84,7 +92,7 @@ Discord Bot must:
 **CURRENT TASKS**
 -------------
 - Troubleshooting command prefixes (Q) (P)
-- Creating Database models and tables for Users, Guilds, UserGuilds via sqlalchemy (E)
+- Creating Database models and tables for Users, Guilds, UserGuilds via SQLite & SQLAlchemy (E) *complete*
 
 
 
@@ -92,18 +100,7 @@ Discord Bot must:
 
 **To-Do**
 ---------------
-- Database
-  - tables:
-    - Users
-    - Guilds
-    - UserGuild
-    - wallets
-  - sqlalchemy, sqlite
 - Debugging commands and command prefix
-
-
-
-
 
 ------------------
 

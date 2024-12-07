@@ -8,11 +8,10 @@
 
 #############################################################################
 
-#import sys
-#sys.path.append(".")
-
 from base import *
 from modules import Database
+from data_models import UserGuild, Responses, Wallet, Base, async_session, initialize_db
+from database_operations import add_to_userguild, get_from_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_user_wallet
 
 from dotenv import load_dotenv
 import discord 
@@ -25,38 +24,27 @@ import aiofiles, aiofiles.os
 import logging
 import logging.handlers
 import asyncio
-import random
+#import random
 from pycolorise.colors import *
-
 import os           #Q# os library is only used to get the TOKEN from the .env file
-load_dotenv()
 
-    
+
+load_dotenv()
 
 
 logger = logging.getLogger(__name__)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
-
-#--------------------------------------------------
+#--------------------------------------------------------------
 class MyClient(commands.Bot):
     """Class object for the bot"""
     def __init__(self, command_prefix, log_handler, log_level, *, intents: discord.Intents):
-        super().__init__(command_prefix=command_prefix, log_handler=log_handler, log_level=log_level, intents= intents) #intents)
-
+        super().__init__(command_prefix=command_prefix, log_handler=log_handler, log_level=log_level, intents= intents)
         # vv from modules import Database
         self.db = Database(Auth.FILENAME)
-        
-        # A CommandTree is a special type that holds all the application command
-        # state required to make it work. This is a separate class because it
-        # allows all the extra state to be opt-in.
-        # Whenever you want to work with application commands, your tree is used
-        # to store and work with them.
         # Note: When using commands.Bot instead of discord.Client, the bot will
         # maintain its own tree instead.
-
         #self.tree = app_commands.CommandTree(self)
-
 
     # In this basic example, we just synchronize the app commands to one guild.
     # Instead of specifying a guild to every command, we copy over our global commands instead.
@@ -69,55 +57,30 @@ class MyClient(commands.Bot):
         else:
             self.tree.copy_global_to(guild=Auth.MY_GUILD)
             await self.tree.sync(guild=Auth.MY_GUILD)
-
-    
-   
 #--------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
 intents = discord.Intents.default() #all() #.default()
+# set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
 intents.message_content = True
 intents.members = True
 bot = MyClient(command_prefix=f'{Auth.COMMAND_PREFIX}',log_handler=handler,log_level=logging.DEBUG,intents=intents) #command_prefix=['$!'],      # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
 
-
-#client = discord.Client(intents=intents)        # https://stackoverflow.com/a/74331540
-
-
-
 #------------------------------------------------------------------------
-
 #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
 #------------------------------------------------------------------------
-bot_status = cycle([
+status_phrases = [
     f"try {Auth.COMMAND_PREFIX}help",
     f"Throwing tomatoes ({Auth.COMMAND_PREFIX}help)",
     f"Shut up, nerd ({Auth.COMMAND_PREFIX}help)",
     f"Cyberbullying Children ({Auth.COMMAND_PREFIX}help)",
     f"there's no //j here! ({Auth.COMMAND_PREFIX}help)",
-    f"developer online: Quinn ({Auth.COMMAND_PREFIX}help)"
-    ])
+    ]
 """List of statuses to cycle through"""
 
+if Auth.DEV_NAME is not None: status_phrases.append(f"developer online: {Auth.DEV_NAME} ({Auth.COMMAND_PREFIX}help)")
 
+bot_status = cycle(status_phrases)
 
 @tasks.loop(seconds = Util.timetick)
 async def change_status():
@@ -132,161 +95,107 @@ async def change_status():
 
 
 
-
-
 @bot.event
-async def on_ready():       #Q# - on_ready(), on_message() is an example of an event callback, aka when something happens
+async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
     print(f'Logged in as {bot.user} (ID: {bot.user.id})')
     print(f"Cycle timer tick has been set to {Util.timetick}")
     change_status.start()                #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
-##    await bot.tree.sync(guild=MY_GUILD) #guild=discord.Object(id=Your guild id))
     print("Ready!")
-    #await client.tree.sync() #client.tree.sync()
 
 
-#@client.event
-#@bot.event
-#async def on_message(message):
-#    if message.author == bot.user:
-#        return
-#
-#    if message.content.startswith('$hello'):
-#        await message.channel.send('Hello!')
-#    
-#    if message.content.startswith('$gambling'):
-#        #do gambling
-#        await message.channel.send("Aw dang it!")
-#    
-#
-#    await bot.process_commands(message)
-#    print(message.content)
+@bot.command(name="dev_online", alias=["dev","do","running"])
+async def dev_online(ctx):
+    """See who's running BraxCord!"""
+    devname = Auth.DEV_NAME
+    await ctx.reply(f"The dev that's running me is {devname}!")
 
 
-#@bot.event
-#async def on_message(message):
-#    await bot.process_commands(message)
-#    print(message.content)
+@bot.event
+#pre-defined function by discord to run when a bot is added to a server
+#when bot is added to server, populate the userguild table with members 
+async def on_guild_join(guild: discord.Guild): 
+    for member in guild.members: #E - for each of the members in the guild 
+        if member.bot == True: #E - if the member is a BOT, drop down to next block of code
+            continue 
+        try: 
+            await add_to_userguild(
+                user_id=member.id, 
+                guild_id=guild.id, 
+                guild_name=guild.name
+            )
+            print(f"Added user of {member.name} with ID {member.id} to UserGuild table for Guild: {guild.name}") #For logging/testing
+        except Exception: 
+            print(f"Could not add user {member.name} to UserGuild table") #For logging/testing'''
+
+@bot.event
+#When the bot has been removed from the server, get rid of data stored by the bot
+async def on_guild_remove(guild: discord.Guild): 
+    removal_count = await delete_from_userguild(guild_id=guild.id) #Remove from UserGuild table where guild_ids match
+
+    if removal_count > 0: 
+        print(f"Successfully removed records for {guild.name} : {guild.id} from UserGuilds") ##For logging & testing
+    else: 
+        print(f"Error removing records for {guild.name} : {guild.id} from UserGuilds")
 
 
+@bot.event 
+async def on_member_join(member: discord.Member): 
+    """When a member joins the server, create their wallet (utilizes create_user_wallet)"""
+    wallet_created = await create_user_wallet(user_id=member.id, initial_balance=0, starting_number_of_tomatoes=0)
+    if wallet_created: 
+        print(f"The wallet was successfully created for {member.name} : {member.id}") #Print to terminal, since this happens by default, user does not need to see this message
+    else: 
+        print(f"There was an error creating the wallet for {member.name} : {member.id}, or, a wallet already exists for this user")
+     
+@bot.event 
+async def on_member_remove(member: discord.Member): 
+    """When a member leaves the server, remove their wallet (utilizes delete_user_wallet)"""
+    wallet_deleted = await delete_user_wallet(user_id=member.id)
+    if wallet_deleted: 
+        print(f"The wallet for user {member.name} : {member.id} has been successfully removed.")
+    else: 
+        print(f"The wallet for user {member.name} could not be deleted, or was not found.")
 
 
+#E# - https://chatgpt.com/share/6753dcab-f708-8007-ad20-126bc14bcd10 - Chatlog for help debugging and getting resources on using the context(ctx) object
+@bot.command(name='wallet', description="Allow user's to view their wallet's contents")
+async def wallet(ctx):
+    """Command to display balance and inventory of a user's wallet (utilizes get_user_wallet & create_user_wallet)"""
+    """If a user is existing in the server but doesn't have a wallet, create one for them"""
+    ##Attributes to create a wallet and address user
+    user_id = ctx.author.id 
+    name = ctx.author.name 
+
+    #Retrieval of data from WALLETS data table 
+    wallet_contents = await get_user_wallet(user_id)
+
+    if wallet_contents: #If the wallet exists, display contents and balance
+        balance = wallet_contents.balance 
+        tomatoes = wallet_contents.number_of_tomatoes
+        await ctx.send(f"💸 {name}, your wallet balance is ${balance}\n You currently have {tomatoes} tomatoes 🍅")
+    else: #Otherwise, the wallet doesn't exist, so create one for the user and add it to the database
+        initial_balance = 0
+        initial_tomatoes = 0
+        await create_user_wallet(user_id, initial_balance, initial_tomatoes)
+        await ctx.send(f"💯 {name}, your wallet has successfully been created with a balance of ${initial_balance} and inventory of {initial_tomatoes} tomatoes")
 
 
-
-
-# Add the guild ids in which the slash command will appear.
-# If it should be in all, remove the argument, but note that
-# it will take some time (up to an hour) to register the
-# command if it's for all guilds.
-#@tree.command(
-#    name="BraxHello",
-#    description="My first application Command",
-#    guild=MY_GUILD #discord.Object(MY_GUILD)
-#)
-#async def first_command(interaction: discord.Interaction):
-#    await interaction.response.send_message("Hello! I am BraxCord")
-
-
-
-# WORKS
-@bot.tree.command(name="hello", description="Says hello!")
-async def hello(interaction: discord.Interaction):
-    """Says hello!"""
-    await interaction.response.send_message("Hello there!")
-
-# WORKS
-@bot.tree.command(name="cogchk", description="Checks the cog commands!")
-async def cogchk(interaction: discord.Interaction):
-    """Check the cog commands!"""
-    cog = bot.get_cog('Ping')
-    commands = cog.get_commands()
-    result = [c.name for c in commands]
-    print(result)
-    await interaction.response.send_message(f"{result}")
-
-
-# WORKS
-@bot.tree.command(name="cogchk2", description="Checks the cog commands! Again! Also with app_commands")
-async def cogchk2(interaction: discord.Interaction):
-    """Check the cog commands!"""
-    cog = bot.get_cog('Ping')
-    commie = cog.get_app_commands()
-    commands = cog.get_commands()
-    result = [c.name for c in commands]
-    result2 = [a.name for a in commie]
-    print(f"commands: {result} \n app commands (use \'/\'): {result2}")
-    await interaction.response.send_message(f"commands: {result} \n app commands (use \'\\\'): {result2}")
-
-
-
-# WORKS
-@bot.tree.command()
-@app_commands.describe(
-    first_value='The first value you want to add something to',
-    second_value='The value you want to add to the first value',
-)
-async def add(interaction: discord.Interaction, first_value: int, second_value: int):
-    """Adds two numbers together."""
-    await interaction.response.send_message(f'{first_value} + {second_value} = {first_value + second_value}')
-
+#TODO: Flesh out this bot command
+@bot.command(name='change_balance', description="Allows server admins to change balance of a user's wallet")
+@commands.has_permissions(administrator=True) #Only allow server admins to interact with this command 
+async def update_wallet_balance(ctx): 
+    """Command to allow server admins to change a user's balance"""
+    pass
 
 
 
-
-
-
-
-#@bot.command(alias=['8ball', '8b', 'eightball', '8 ball'])
-#async def magic_eightball(ctx, *, question=None):
-#    #with open("responses.txt", "r") as f:        # "r" = read mode   
-#    #    random_responses = f.readlines()                    # file is being treated as a list
-#    #    response = random.choice(random_responses)
-#    
-#    if question is not None:
-#        with open ('responses.txt', 'r',  encoding='utf-8') as f:
-#            random_responses = f.readlines()
-#            response = random.choice(random_responses)
-#        
-#            await ctx.send(f"The answer to \"{question}\" is this: {response}")
-#    else:
-#        await ctx.send('You did not ask a question.')
-#    
-    
-
-
-#@bot.command(name='7ball')
-#async def magic_sevenball(ctx, *, question):
-#    
-#    async with open("./responses.txt", 'r', encoding='utf-8') as f:        # "r" = read mode   
-#        random_responses = f.readlines()                    # file is being treated as a list
-#        response = random.choice(random_responses)
-#        await response
-#
-#    await ctx.send(f"The answer to \"{question}\" is this: {response}")
-
-
-#WORKS
-@bot.tree.command()
-async def get_username(interaction: discord.Interaction):
-    """Gets the username of the user who invoked the command."""
-    logger.info('Doing something')
-    username = interaction.user.name
-    julien = interaction.user.nick
-    feets = interaction.user.joined_at
-    print(f'{interaction.user.id}\t{username}')
-    await interaction.response.send_message(f'Your username is {username}. nickname: {julien}. joined at: {feets}', silent=True, ephemeral=True)
+# -----------------------------------------------------------------------------------------------------------
 
 
 
 
-
-
-
-
-
-
-# would ideally be merged into the MyClient class
+#Q# would ideally be eventually merged into the MyClient class
 async def load():
     """
     Acts as MyClient()'s `async def on_ready(self)`.
@@ -295,7 +204,7 @@ async def load():
     - Loads cogs
     - awaits db.[TABLE_NAME].create_table()
     """
-    bot.remove_command('help')
+    bot.remove_command('help')  # removed to accommodate for the Help.py cog
     
     #for filename in os.listdir("./cogs"):
     #    if filename.endswith(".py"):
@@ -313,11 +222,15 @@ async def load():
             except:
                 print(Blue(f"- {filename} ❌ "))
     ####  HERE  ######
+    await initialize_db()
     #await bot.db.bank.create_table()
     #await bot.db.inv.create_table()
     await bot.db.resp.create_table()
     
-    #print(Cyan("Created/modified tables successfully"))
+    print(Cyan("Created/modified tables successfully"))
+
+
+# -----------------------------------------------------------------------------------
 
 
 async def main():
@@ -347,20 +260,12 @@ async def main():
     
     async with bot:
         logger.info('running: main > _async with bot_')
-        #bot.setup_hook = load()
         await load()
-        #await on_ready(bot)
         await bot.start(Auth.TOKEN)   # replaces client.run(TOKEN)
-        
 
 
-
-
-
+# ----------------------------------------------------------
 
 asyncio.run(main())
 logger.info('Finished')
 
-
-#client.run(os.getenv(TOKEN))      #Q# make sure that a .env file containing "TOKEN="{the_discord_bot_token}"" is in your project root directory
-#client.run(TOKEN)                   #Q# Solution found via: https://stackoverflow.com/a/63530919

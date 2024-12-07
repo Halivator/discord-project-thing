@@ -38,18 +38,18 @@ class Dev(commands.Cog):
 			return chk
 		return commands.check(predicate)
     
-	def second_check():
-		async def predicate(ctx):
-			chk = False
-			print(f'author id:\t{ctx.message.author.id}')
-			print(f'dev id:\t\t{Auth.DEV_ID}')
-			author = int(ctx.message.author.id)
-			dev = int(Auth.DEV_ID)
-			if author != dev:
-				chk = True
-			print(f'{chk}')
-			return chk
-		return commands.check(predicate)
+#	def second_check():
+#		async def predicate(ctx):
+#			chk = False
+#			print(f'author id:\t{ctx.message.author.id}')
+#			print(f'dev id:\t\t{Auth.DEV_ID}')
+#			author = int(ctx.message.author.id)
+#			dev = int(Auth.DEV_ID)
+#			if author != dev:
+#				chk = True
+#			print(f'{chk}')
+#			return chk
+#		return commands.check(predicate)
 
 
  
