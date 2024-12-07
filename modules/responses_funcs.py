@@ -283,7 +283,7 @@ class Responses:
 
         return await self._db.execute(
             f"SELECT * FROM `{TABLE_NAME}`",
-            (guild.id,), fetch="all", conn = conn
+            fetch="all", conn = conn
         )
         
         
