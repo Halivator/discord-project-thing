@@ -260,8 +260,7 @@ async def wallet(ctx):
         initial_balance = 0
         initial_tomatoes = 0
         await create_user_wallet(user_id, initial_balance, initial_tomatoes)
-        await ctx.send(f"💯 {name}, your wallet has successfully been created with a balance of ${initial_balance} and inventory of {initial_tomatoes}")
-
+        await ctx.send(f"💯 {name}, your wallet has successfully been created with a balance of ${initial_balance} and inventory of {initial_tomatoes} tomatoes")
 
 
 #TODO: Flesh out this bot command
