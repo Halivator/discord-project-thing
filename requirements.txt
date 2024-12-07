@@ -2,3 +2,5 @@
 discord.py
 python-dotenv
 aiofiles
+asyncio
+pycolorise
