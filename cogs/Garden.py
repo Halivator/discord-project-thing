@@ -5,6 +5,11 @@
 # Code Source: ChatGPT: https://chatgpt.com/share/674ce36d-ba44-8002-a0f0-4cc8ceb814de
 #############################################################################
 
+from data_models import Wallet, Base
+from data_models import UserGuild, Responses, Wallet, Base, async_session, initialize_db
+from database_operations import add_to_userguild, get_from_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_user_wallet
+
+
 import discord
 from discord.ext import commands
 from discord.ui import Button, View
@@ -13,7 +18,6 @@ import logging
 from sqlalchemy import create_engine, MetaData, Table 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from data_models import Wallet, Base
 
 import random
 
@@ -48,29 +52,40 @@ class GardenCog(commands.Cog):
         button2 = Button(label="Water", style=discord.ButtonStyle.blurple)
 
         # Create random values
-        random_plant = random.randint(1, 5)
-        random_water = random.randint(1, 3)
+        #random_plant = random.randint(1, 5)
+        #random_water = random.randint(1, 3)
 
         # Define what happens when the "Plant" button is clicked
         async def button1_callback(interaction: discord.Interaction):
             await interaction.response.defer(ephemeral=True)
+            random_plant = random.randint(1, 5)
+
             try:
                 with Session() as session:
                     user_id = str(interaction.user.id)
-                    wallet = session.query(Wallet).filter_by(user_id=user_id).first()
-                    print(f'[{__name__}]:\t[wallet]:\t{wallet}')
+                    #wallet = session.query(Wallet).filter_by(user_id=user_id).first()
+                    returned_wallet = await get_user_wallet(user_id)
+                    print(f'[{__name__}]:\t[returned_wallet]:\t<balance>: {returned_wallet.balance}\t<number_of_tomatoes>: {returned_wallet.number_of_tomatoes}\n\t<returned_wallet object>{returned_wallet}')
+                    if returned_wallet: #If the wallet exists, display contents and balance
+                        balance = returned_wallet.balance 
+                        tomatoes = returned_wallet.number_of_tomatoes
+                        print(f'[{__name__}]:\t[returned_wallet]:\tyour wallet balance is ${balance}\n\t You currently have {tomatoes} tomatoes')
 
-                    if wallet:
-                        wallet.number_of_tomatoes += random_plant
+
+
+                    if returned_wallet:
+                        print(f'[{__name__}]: [returned_wallet]: True')
+                        returned_wallet.number_of_tomatoes += random_plant
                         session.commit()
                         logger.info(f"{interaction.user.display_name} planted {random_plant} tomatoes.")
                         await interaction.followup.send(
-                            f"You planted {random_plant} tomatoes! Total tomatoes: {wallet.number_of_tomatoes}.",
+                            f"You planted {random_plant} tomatoes! Total tomatoes: {returned_wallet.number_of_tomatoes}.",
                             ephemeral=True
                         )
                     else:
+                        print(f'[{__name__}]: [returned_wallet]: False')
                         await interaction.followup.send(
-                            "You don't have a wallet yet!",
+                            "You don't have a wallet yet! Use `!wallet` to register one!",
                             ephemeral=True
                         )
             except Exception as e:
@@ -82,14 +97,18 @@ class GardenCog(commands.Cog):
         # Define what happens when the "Water" button is clicked
         async def button2_callback(interaction: discord.Interaction):
             await interaction.response.defer(ephemeral=True)
+            random_water = random.randint(1, 3)
             try:
                 with Session() as session:
                     user_id = str(interaction.user.id)
-                    wallet = session.query(Wallet).filter_by(user_id=user_id).first()
-                    print(f'[{__name__}]:\t[wallet]:\t{wallet}')
+                    #wallet = session.query(Wallet).filter_by(user_id=user_id).first()
+                    returned_wallet = await get_user_wallet(user_id)
 
-                    if wallet:
-                        wallet.number_of_tomatoes += random_water
+                    print(f'[{__name__}]:\t[returned_wallet]:\t<balance>: {returned_wallet.balance}\t<number_of_tomatoes>: {returned_wallet.number_of_tomatoes}\n\t<returned_wallet object>{returned_wallet}')
+
+                    if returned_wallet:
+                        print(f'[{__name__}]: [returned_wallet]: True')
+                        returned_wallet.number_of_tomatoes += random_water
                         session.commit()
                         logger.info(f"{interaction.user.display_name} watered their tomatoes and received {random_water} tomato(es).")
                         await interaction.followup.send(
@@ -97,6 +116,7 @@ class GardenCog(commands.Cog):
                             ephemeral=True
                         )
                     else:
+                        print(f'[{__name__}]: [returned_wallet]: False')
                         await interaction.followup.send(
                             f"Error. {interaction.user.display_name} does not have a wallet.",
                             ephemeral=True
