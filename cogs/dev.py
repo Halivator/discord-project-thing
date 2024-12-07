@@ -5,6 +5,11 @@ import discord
 from sys import version_info as sysv
 from os import listdir
 
+import sys
+sys.path.append("..")
+
+from base import Auth
+
 class Dev(commands.Cog):
 	"""This is a cog with owner-only commands.
 	Note:
@@ -19,6 +24,36 @@ class Dev(commands.Cog):
 		self.bot = bot
 
 
+
+	def dev_check():
+		async def predicate(ctx):
+			chk = False
+			print(f'author id:\t{ctx.message.author.id}')
+			print(f'dev id:\t\t{Auth.DEV_ID}')
+			author = int(ctx.message.author.id)
+			dev = int(Auth.DEV_ID)
+			if author == dev:
+				chk = True
+				print(f'{chk}')
+			return chk
+		return commands.check(predicate)
+    
+	def second_check():
+		async def predicate(ctx):
+			chk = False
+			print(f'author id:\t{ctx.message.author.id}')
+			print(f'dev id:\t\t{Auth.DEV_ID}')
+			author = int(ctx.message.author.id)
+			dev = int(Auth.DEV_ID)
+			if author != dev:
+				chk = True
+			print(f'{chk}')
+			return chk
+		return commands.check(predicate)
+
+
+ 
+ 
 	@commands.Cog.listener()
 	#This is the decorator for events (inside of cogs).
 	async def on_ready(self):
@@ -28,7 +63,8 @@ class Dev(commands.Cog):
 
 	@commands.command(name='reloadall', hidden=True)#This command is hidden from the help menu.
 	#This is the decorator for commands (inside of cogs).
-	@commands.is_owner()
+ 	#@commands.is_owner()
+	@commands.check_any(commands.is_owner(), dev_check())
 	#Only the owner (or owners) can use the commands decorated with this.
 	async def reload_all(self, ctx):
 		"""This commands reloads all the cogs in the `./cogs` folder.
@@ -39,7 +75,13 @@ class Dev(commands.Cog):
 			This command deletes its messages after 20 seconds."""
 
 		message = await ctx.send('Reloading...')
-		await ctx.message.delete()
+		ct = ""
+		works = False
+		try:
+			await ctx.message.delete()
+			works = True
+		except Exception as exc:
+			await ct = f'An error has occurred: {exc}'
 		try:
 			for cog in listdir('./cogs'):
 				if cog.endswith('.py') == True:
@@ -48,6 +90,8 @@ class Dev(commands.Cog):
 			await message.edit(content=f'An error has occurred: {exc}', delete_after=20)
 		else:
 			await message.edit(content='All cogs have been reloaded.', delete_after=20)
+		if works == False:
+			await ctx.send(f"{ct}", delete_after=25, silent=True)
 
 
 	def check_cog(self, cog):
@@ -66,7 +110,7 @@ class Dev(commands.Cog):
 		return f'cogs.{cog.lower()}'
 
 	@commands.command(name='load', hidden=True)
-	@commands.is_owner()
+	@commands.check_any(commands.is_owner(), dev_check())	
 	async def load_cog(self, ctx, *, cog: str):
 		"""This commands loads the selected cog, as long as that cog is in the `./cogs` folder.
 				
@@ -79,17 +123,28 @@ class Dev(commands.Cog):
 			This command deletes its messages after 20 seconds.
 		"""
 		message = await ctx.send('Loading...')
-		await ctx.message.delete()
+		ct = ""
+		works = False
+		try:
+			await ctx.message.delete()
+			works = True
+		except Exception as exc:
+			await ct = f'An error has occurred: {exc}'
 		try:
 			self.bot.load_extension(self.check_cog(cog))
 		except Exception as exc:
 			await message.edit(content=f'An error has occurred: {exc}', delete_after=20)
 		else:
 			await message.edit(content=f'{self.check_cog(cog)} has been loaded.', delete_after=20)
+		if works == False:
+			await ctx.send(f"{ct}", delete_after=25, silent=True)
+
+
+
 
 
 	@commands.command(name='unload', hidden=True)
-	@commands.is_owner()
+	@commands.check_any(commands.is_owner(), dev_check())	
 	async def unload_cog(self, ctx, *, cog: str):
 		"""This commands unloads the selected cog, as long as that cog is in the `./cogs` folder.
 		
@@ -101,17 +156,30 @@ class Dev(commands.Cog):
 			This command deletes its messages after 20 seconds.
 		"""
 		message = await ctx.send('Unloading...')
-		await ctx.message.delete()
+		ct = ""
+		works = False
+		try:
+			await ctx.message.delete()
+			works = True
+		except Exception as exc:
+			await ct = f'An error has occurred: {exc}'
 		try:
 			self.bot.unload_extension(self.check_cog(cog))
 		except Exception as exc:
 			await message.edit(content=f'An error has occurred: {exc}', delete_after=20)
 		else:
 			await message.edit(content=f'{self.check_cog(cog)} has been unloaded.', delete_after=20)
+		if works == False:
+			await ctx.send(f"{ct}", delete_after=25, silent=True)
+
+
+
+
+
 
 
 	@commands.command(name='reload', hidden=True)
-	@commands.is_owner()
+	@commands.check_any(commands.is_owner(), dev_check())	
 	async def reload_cog(self, ctx, *, cog: str):
 		"""This commands reloads the selected cog, as long as that cog is in the `./cogs` folder.
 		
@@ -123,15 +191,46 @@ class Dev(commands.Cog):
 			This command deletes its messages after 20 seconds.
 		"""
 		message = await ctx.send('Reloading...')
-		await ctx.message.delete()
+		ct = ""
+		works = False
+		try:
+			await ctx.message.delete()
+			works = True
+		except Exception as exc:
+			await ct = f'An error has occurred: {exc}'
+
 		try:
 			self.bot.reload_extension(self.check_cog(cog))
 		except Exception as exc:
 			await message.edit(content=f'An error has occurred: {exc}', delete_after=20)
 		else:
 			await message.edit(content=f'{self.check_cog(cog)} has been reloaded.', delete_after=20)
+		if works == False:
+			await ctx.send(f"{ct}", delete_after=25, silent=True)
+
 
 
 async def setup(bot):
 	"""Every cog needs a setup function like this."""
 	await bot.add_cog(Dev(bot))
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ ## Added the following to account for missing `manage_messages` permissions
+##	Replaces message.deleted()
+# 		ct = ""
+#		works = False
+#		try:
+#			await ctx.message.delete()
+#			works = True
+#		except Exception as exc:
+#			await ct = f'An error has occurred: {exc}'
+
+##  Goes after the result of the commands
+#		if works == False:
+#			await ctx.send(f"{ct}", delete_after=25, silent=True)
+

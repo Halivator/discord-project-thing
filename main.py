@@ -8,6 +8,9 @@
 
 #############################################################################
 
+#import sys
+#sys.path.append(".")
+
 from base import *
 from modules import Database
 
@@ -92,6 +95,7 @@ class MyClient(commands.Bot):
 # set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
 intents = discord.Intents.default() #all() #.default()
 intents.message_content = True
+intents.members = True
 bot = MyClient(command_prefix=f'{Auth.COMMAND_PREFIX}',log_handler=handler,log_level=logging.DEBUG,intents=intents) #command_prefix=['$!'],      # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
 
 
@@ -125,7 +129,6 @@ async def change_status():
 
 
 #------------------------------------------------------------------------
-
 
 
 
@@ -271,7 +274,8 @@ async def get_username(interaction: discord.Interaction):
     username = interaction.user.name
     julien = interaction.user.nick
     feets = interaction.user.joined_at
-    await interaction.response.send_message(f'Your username is {username}. nickname: {julien}. joined at: {feets}')
+    print(f'{interaction.user.id}\t{username}')
+    await interaction.response.send_message(f'Your username is {username}. nickname: {julien}. joined at: {feets}', silent=True, ephemeral=True)
 
 
 

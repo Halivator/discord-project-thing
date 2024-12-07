@@ -7,6 +7,7 @@ from discord.ext import commands
 
 
 class Events(commands.Cog):
+    """Handles command errors! Ported from Econ Bot"""
     def __init__(self, client: commands.Bot):
         self.client = client
 

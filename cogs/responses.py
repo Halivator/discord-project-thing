@@ -22,17 +22,18 @@ logger = logging.getLogger(__name__)
 class Responses(commands.Cog):
     """
     Controls Brax's phrases to respond to!
-    
     Uses a separate database from the economy.
-
     Needs to be tweaked to account for case sensitivity and substring detection.
-    
-    Utilizes Debugging Verbosity levels that are detailed in `modules/responses_funcs.py`.
-    - To set the desired verbosity levels for your terminal window, edit the parameters in `modules/__init__.py`
-    
-    Args:
-        commands (_type_): _description_
     """
+    
+    
+    #Utilizes Debugging Verbosity levels that are detailed in `modules/responses_funcs.py`.
+    #- To set the desired verbosity levels for your terminal window, edit the parameters in `modules/__init__.py`
+    #
+    #Args:
+    #    commands (_type_): _description_
+    
+    
     def __init__(self, bot): #client: EconomyBot):
         self.client = bot
         #self.bank = self.client.db.bank
@@ -75,14 +76,14 @@ class Responses(commands.Cog):
     async def responder(self, message):
         
         
-        #skip = False    # Determines if the subsequent steps should be skipped
+        skip = False    # Determines if the subsequent steps should be skipped
         
         if message.author == self.client.user:
             if self.resp._v4check():
                 print(f'>\t{message.author.name} | {message.channel.name} | {message.content}')
             if self.resp._v3check():
                 print(f'{__name__}:\t{message.author.name} is the same as self.user. Returning....')
-            return
+            skip = True
         else:
             print(f'>\t{message.author.name} | {message.channel.name} | {message.content}')
         
@@ -106,92 +107,93 @@ class Responses(commands.Cog):
         for cmd in command_container:
             if (cmd in message.content):
                 if self.resp._v3check(): print(f'{__name__}:\tCOMMAND ATTEMPTED. ABORTING RESPONDER')
+                skip = True
                 return
 
-
-        options = []
-        await self.resp.open_resp(message.guild)
-        data = await self.resp.get_resp(message.guild, message.content)
-        #bdata = await self.resp.nget_resp(message.guild, message.content)
-        #cdata = await self.resp.sget_resp(message.guild, message.content)
-        checker = False
-        if data is not None:
-                checker = True
-        if self.resp._v3check(): print(f'{__name__}: [data]: has data?\t{checker}')
-        
-        #if message.guild.id not in [ resps["message_to_detect"] for resps in data]:
-
-        #wordber = message.content.split(' ')
-        #for word in wordber:
-        #print(f'{word} is {type(word)} type')
-        
-        
-        original_value = None
-        for resps in data:
-            if self.resp._v3check(): print(f'looping!!')
-            if message.content.lower() == resps[2].lower():
-                original_value = resps[2]
-                if self.resp._v3check(): print(f'original_value set!')
-            else:
-                if self.resp._v3check(): print('Nope!!')
-        
-        #TODO: figure out work around for case sensitivity... I worry it might have to be done by starting from scratch again, but for now i'm done \(>~<)/ --Q
-        #print(f'{message.content.lower()}')
-        #
-        ## Using next with a generator to find the matching 'resps'
-        #matching_resps = next(
-        #    (resps for resps in data if message.content.lower() == [resps[2]].lower()), 
-        #    None
-        #)
-#
-        #if matching_resps:
-        #    print(f"Original value of resps[2]: {matching_resps[2]}")
-        #    print(f"lowered value of resps[2]: {matching_resps[2].lower()}")
-        #else:
-        #    print("No match found for the message content.")
-
-        
-        
-        
-        if message.content in [ resps[2] for resps in data]:
+        if not skip:
+            options = []
+            await self.resp.open_resp(message.guild)
+            data = await self.resp.get_resp(message.guild, message.content)
+            #bdata = await self.resp.nget_resp(message.guild, message.content)
+            #cdata = await self.resp.sget_resp(message.guild, message.content)
+            checker = False
+            if data is not None:
+                    checker = True
+            if self.resp._v3check(): print(f'{__name__}: [data]: has data?\t{checker}')
             
-            if self.resp._v1check(): print(f'{__name__}\t{message.content} found in get_resp')
+            #if message.guild.id not in [ resps["message_to_detect"] for resps in data]:
+
+            #wordber = message.content.split(' ')
+            #for word in wordber:
+            #print(f'{word} is {type(word)} type')
             
             
-            options = await self.resp.sget_resp(message.guild, original_value) #message.content
+            original_value = None
+            for resps in data:
+                if self.resp._v3check(): print(f'looping!!')
+                if message.content.lower() == resps[2].lower():
+                    original_value = resps[2]
+                    if self.resp._v3check(): print(f'original_value set!')
+                else:
+                    if self.resp._v3check(): print('Nope!!')
             
-            if self.resp._v2check():
-                print(f'{__name__}: [options]: [PRINTING LOOP...]')
-                for row in options:
-                    print(f"\t- responseID[0]: {row[0]}, guildID[1]: {row[1]}, message_to_detect[2]: {row[2]}, output[3]: {row[3]}")  # Replace with actual columns
-                print(f'{__name__}: [options]: [END LOOP...]')
-            opt = random.choice(options)
-            if self.resp._v1check(): print(f'{__name__}:\n[OUTPUT]:\t\t{opt[3]}')
-            await message.channel.send(f'{opt[3]}')
-        #for resps in data:
-        #    if word in resps[2]:
-        #        print(f'{word} found')
-        #    else:
-        #        print(f'{word} not found')
-        
+            #TODO: figure out work around for case sensitivity... I worry it might have to be done by starting from scratch again, but for now i'm done \(>~<)/ --Q
+            #print(f'{message.content.lower()}')
+            #
+            ## Using next with a generator to find the matching 'resps'
+            #matching_resps = next(
+            #    (resps for resps in data if message.content.lower() == [resps[2]].lower()), 
+            #    None
+            #)
+    #
+            #if matching_resps:
+            #    print(f"Original value of resps[2]: {matching_resps[2]}")
+            #    print(f"lowered value of resps[2]: {matching_resps[2].lower()}")
+            #else:
+            #    print("No match found for the message content.")
 
-
+            
+            
+            
+            if message.content in [ resps[2] for resps in data]:
                 
-        
+                if self.resp._v1check(): print(f'{__name__}\t{message.content} found in get_resp')
+                
+                
+                options = await self.resp.sget_resp(message.guild, original_value) #message.content
+                
+                if self.resp._v2check():
+                    print(f'{__name__}: [options]: [PRINTING LOOP...]')
+                    for row in options:
+                        print(f"\t- responseID[0]: {row[0]}, guildID[1]: {row[1]}, message_to_detect[2]: {row[2]}, output[3]: {row[3]}")  # Replace with actual columns
+                    print(f'{__name__}: [options]: [END LOOP...]')
+                opt = random.choice(options)
+                if self.resp._v1check(): print(f'{__name__}:\n[OUTPUT]:\t\t{opt[3]}')
+                await message.channel.send(f'{opt[3]}')
+            #for resps in data:
+            #    if word in resps[2]:
+            #        print(f'{word} found')
+            #    else:
+            #        print(f'{word} not found')
+            
+
+
+                    
+            
 
 
 
-        
-        if message.content.startswith('$hello'):
-            await message.channel.send('Hello!')
-        
-        if message.content.startswith('$gambling'):
-            #do gambling
-            await message.channel.send("Aw dang it!")
-        
+            
+            if message.content.startswith('$hello'):
+                await message.channel.send('Hello!')
+            
+            if message.content.startswith('$gambling'):
+                #do gambling
+                await message.channel.send("Aw dang it!")
+            
     
-        await self.client.process_commands(message)
         print(f'> {message.author.name} | {message.channel.name} | {message.content}')
+        #await self.client.process_commands(message)
 
 
 

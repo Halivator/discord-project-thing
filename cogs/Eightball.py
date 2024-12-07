@@ -7,19 +7,52 @@ import aiofiles
 import logging, logging.handlers
 import os           #Q# os library is only used to get the TOKEN from the .env file
 
+
+import sys
+sys.path.append("..")
+
+from base import Auth
+
+
 logger = logging.getLogger(__name__)
 
 class Eightball(commands.Cog):
     """
     Lets go gambling!
-    AW DANG IT
-    AW DANG IT
-    AW DANG IT
-    AW DANG IT
+    AW DANG IT!\t\tAW DANG IT!
+    AW DANG IT!\t\tAW DANG IT!
     """
     
     def __init__(self, client):
         self.client = client
+    
+    
+    def custom_check():
+        async def predicate(ctx):
+            chk = False
+            print(f'author id:\t{ctx.message.author.id}')
+            print(f'dev id:\t\t{Auth.DEV_ID}')
+            author = int(ctx.message.author.id)
+            dev = int(Auth.DEV_ID)
+            if author == dev:
+                chk = True
+                print(f'{chk}')
+            return chk
+        return commands.check(predicate)
+    
+    def second_check():
+        async def predicate(ctx):
+            chk = False
+            print(f'author id:\t{ctx.message.author.id}')
+            print(f'dev id:\t\t{Auth.DEV_ID}')
+            author = int(ctx.message.author.id)
+            dev = int(Auth.DEV_ID)
+            if author != dev:
+                chk = True
+            print(f'{chk}')
+            return chk
+        return commands.check(predicate)
+
     
     @commands.Cog.listener()    # events use this decorator
     async def on_ready(self):
@@ -65,12 +98,27 @@ class Eightball(commands.Cog):
         return lines
     
     
+    @commands.check_any(custom_check(), second_check())
+    @commands.hybrid_command(name="tester", with_app_command=True, hidden=True)
+    async def tester(self, ctx: commands.Context):
+        
+        await ctx.defer()
+        await asyncio.sleep(5)
+        await ctx.reply(f'yep ur a dev', mention_author=True)
+
     
     
-    
-    @commands.command(name="newballer", description="yet another 8ball")
+    @commands.command(name="eightball", alias=["8b","magic_eightball","eight_ball"], description="yet another 8ball")
     @app_commands.describe(message="The question to ask")
     async def newballer(self, ctx, *, message: str = None):
+        """Hey, Nerd! Here, have this Magic Eightball!
+        
+        (Ask the magic eightball a question and see what it has to say!)
+        (For the developer: check out `eightball_responses.txt` to edit the responses)
+        
+        Args:
+            message (str, optional): The question to ask. Defaults to None.
+        """
         lines = []
         lines = await self.read_file_to_list('eightball_responses.txt')
         response = random.choice(lines)
@@ -82,19 +130,40 @@ class Eightball(commands.Cog):
         await ctx.send(f'{response}')
     
     
-    @commands.hybrid_command(name="baller", description="yet another 8ball", with_app_command=True)
-    @app_commands.describe(message="The question to ask")
+    
+    #TODO: Fix the fact that Brax only seems to detect himself instead of the members within a channel
+    @commands.hybrid_command(name="baller", alias=["ball", "b", "blr", "magic"], description="yet another 8ball", with_app_command=True)
+    @app_commands.describe(message="What do you want now, Nerd?")
     async def baller(self, ctx: commands.Context, *, message: str):
-        async with aiofiles.open('eightball_responses.txt', mode='r') as f:
+        """Ha! Look how much cooler my eightball is compared to yours! I'll let you try it if you admit mine is cooler, Nerd!
+
+        Args:
+            message (str): _description_
+        """
+        members = ctx.channel.members #finds members connected to the channel
+
+        memids = [] #(list)
+        for member in members:
+            print(f'{member}')
+            memids.append(member)
+            
+        if message is not None:
+            await ctx.send(f"\"{message}\", huh?", delete_after=25, silent=True)
+
+        await ctx.send(f"Hmm...Let's see...", delete_after=25, silent=True)
+        async with aiofiles.open('eightball_cooler_responses.txt', mode='r') as f:
             lines = []
-            lines = await self.read_file_to_list('eightball_responses.txt')
+            lines = await self.read_file_to_list('eightball_cooler_responses.txt')
             response = random.choice(lines)
-            if message is not None:
-                response = f"The answer to \"{message}\" is this: {response}"
+            
+            if '[USER]' in response:
+                reslist = response.rsplit("[USER]")
+                spy = random.choice(memids)
+                response = (f'{reslist[0]}{member.display_name}{reslist[1]}')
             
         await ctx.defer()
         await asyncio.sleep(5)
-        await ctx.send(f'{response}')
+        await ctx.reply(f'{response}', mention_author=True)
     
     
         

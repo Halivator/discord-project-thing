@@ -9,6 +9,11 @@ from pycolorise.colors import *
 
 load_dotenv(find_dotenv(raise_error_if_not_found=True))
 
+__all__ = [
+    "Util",
+    "Auth"
+]
+
 
 class Util:
     """
@@ -36,6 +41,7 @@ class Auth:
     #t_id = int(T_GUILD)
     MY_GUILD = discord.Object(id=int(T_GUILD))
     FILENAME = os.getenv("FILENAME")
+    DEV_ID = os.getenv("DEVELOPER_ID")
     """Determines the filename of the .db file"""
 
 
