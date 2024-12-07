@@ -25,33 +25,32 @@ async def add_to_userguild(user_id: int, guild_id: int, guild_name: str):
 
 #READ 
 #Get by a user's ID
-#Review these (get wallet) - not sure it will work exactly the same was as for P1
+#Modified to work with async sqlalchemy
 async def get_from_userguild(user_id: int): 
-    try: #Adding exception handling for logging just in case this doesn't work as expected
+    try:
         async with async_session() as db_session: 
-            userguild_to_get = await db_session.query(UserGuild).filter(UserGuild.user_id == user_id).first()
-            return userguild_to_get
+            query_userguilds = await db_session.execute(select(UserGuild).filter(UserGuild.user_id == user_id))
+
+            userguild_record_to_get = query_userguilds.scalar_one_or_none() 
+            return userguild_record_to_get
     except Exception as e: #Similar to try-catch in C#
-        print("User, {user_id}, is not found in any servers. Cannot be retrieved.") #Print to termimal for logging
+        print(f"User, {user_id}, is not found in any servers. Cannot be retrieved.") #Print to termimal for logging
         return None
 
 #DELETE 
 async def delete_from_userguild(guild_id: int):
     """Delete from UserGuild session""" 
     async with async_session() as db_session: 
-        userguild_records_to_delete = await db_session.execute(
-            delete(UserGuild).filter(UserGuild.guild_id == guild_id) #Fetch and directly delete records with a matching guild_id
-        )
-       
+        userguild_records_to_delete = await db_session.execute(delete(UserGuild).filter(UserGuild.guild_id == guild_id)) #Fetch and directly delete records with a matching guild_id
         await db_session.commit() #commit delete transaction
         return userguild_records_to_delete.rowcount()
 
 #Set of CRUD operations for wallets table 
 #CREATE
-async def create_user_wallet(user_id: int, balance: int, number_of_tomatoes: int): 
+async def create_user_wallet(user_id: int, initial_balance: int = 0, starting_number_of_tomatoes: int = 0): 
     """Create an entry for a user in the wallets table""" 
     async with async_session() as db_session: 
-        new_wallet = Wallet(user_id=user_id, balance=balance, number_of_tomatoes=number_of_tomatoes)
+        new_wallet = Wallet(user_id=user_id, balance=initial_balance, number_of_tomatoes=starting_number_of_tomatoes)
         db_session.add(new_wallet)
         await db_session.commit() 
         return new_wallet
@@ -62,11 +61,12 @@ async def get_user_wallet(user_id: int):
     """Get the status of the user's wallet"""
     try: 
         async with async_session() as db_session: 
-            wallet_to_get = await db_session.query(Wallet).filter(Wallet.user_id == user_id).first()
+            query_wallet = await db_session.execute(select(Wallet).filter(Wallet.user_id==user_id)) 
+            
+            wallet_to_get = query_wallet.scalar_one_or_none() #https://docs.sqlalchemy.org/en/20/core/connections.html#sqlalchemy.engine.ScalarResult.one_or_none ; returns an object or an exception
             return wallet_to_get
     except Exception as e: 
-        print("Wallet for user {user_id} cannot be retrieved: it either doesn't exsist, or entry was invalid.") #print to terminal
-        return None
+        print(f"Wallet for user {user_id} cannot be retrieved: it either doesn't exsist, or entry was invalid.") #print to terminal
 
 #UPDATE
 async def update_user_wallet(user_id: int, updatedWallet:WalletModel):
@@ -92,4 +92,3 @@ async def delete_user_wallet(user_id: int):
         
     await db_session.commit() 
     return wallet_to_delete
-

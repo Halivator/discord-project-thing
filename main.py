@@ -1,7 +1,7 @@
 ### BraxCord Discord Bot
 # main.py
 # Created: 11/11/24 ~ 5:21pm
-# Last Updated: 12/01/24 ~ 7:34pm
+# Last Updated: 12/07/24 ~ 12:27 AM
 
 #Q# NOTE: 11/11-Q: tutorial followed for initial code setup below:  (planning to remove some of the comment annotations at a later date)
 # https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
@@ -28,10 +28,7 @@ logger = logging.getLogger(__name__)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
 TOKEN = os.getenv("DISCORD_TOKEN")
-
 APP_ID = os.getenv("APPLICATION_ID")
-#APPLICATION_ID="1305627246022627359"
-
 MY_GUILD = discord.Object(id=1182049728058380409)
 
 #slash commands instead of old! commands
@@ -71,8 +68,6 @@ bot = MyClient(intents=intents) #command_prefix=['$!'],      # https://discordpy
 #bot.application_id(APP_ID)
 
 #tree = app_commands.CommandTree(bot)
-#
-#
 # HERE https://stackoverflow.com/questions/71165431/how-do-i-make-a-working-slash-command-in-discord-py
 
 #Q# More about @client.events  :     https://discordpy.readthedocs.io/en/latest/api.html#discord.Client.event
@@ -116,7 +111,7 @@ async def on_message(message):
 
 @bot.event
 #pre-defined function by discord to run when a bot is added to a server
-#this primarily works with fresh servers that the bot has not been added to before
+#when bot is added to server, populate the userguild table with members 
 async def on_guild_join(guild: discord.Guild): 
     for member in guild.members: #E - for each of the members in the guild 
         if member.bot == True: #E - if the member is a BOT, drop down to next block of code
@@ -132,6 +127,7 @@ async def on_guild_join(guild: discord.Guild):
             print(f"Could not add user {member.name} to UserGuild table") #For logging/testing'''
 
 @bot.event
+#When the bot has been removed from the server, get rid of data stored by the bot
 async def on_guild_remove(guild: discord.Guild): 
     removal_count = await delete_from_userguild(guild_id=guild.id) #Remove from UserGuild table where guild_ids match
 
@@ -141,17 +137,23 @@ async def on_guild_remove(guild: discord.Guild):
         print(f"Error removing records for {guild.name} : {guild.id} from UserGuilds")
 
 @bot.event 
-async def on_member_join(): 
+async def on_member_join(member: discord.Member): 
     """When a member joins the server, create their wallet (utilizes create_user_wallet)"""
-    pass 
-
+    wallet_created = await create_user_wallet(user_id=member.id, initial_balance=0, starting_number_of_tomatoes=0)
+    if wallet_created: 
+        print(f"The wallet was successfully created for {member.name} : {member.id}") #Print to terminal, since this happens by default, user does not need to see this message
+    else: 
+        print(f"There was an error creating the wallet for {member.name} : {member.id}, or, a wallet already exists for this user")
+     
 @bot.event 
-async def on_member_remove(): 
+async def on_member_remove(member: discord.Member): 
     """When a member leaves the server, remove their wallet (utilizes delete_user_wallet)"""
-    pass
-
-@bot.event 
-        
+    wallet_deleted = await delete_user_wallet(user_id=member.id)
+    if wallet_deleted: 
+        print(f"The wallet for user {member.name} : {member.id} has been successfully removed.")
+    else: 
+        print(f"The wallet for user {member.name} could not be deleted, or was not found.")
+       
 #@bot.event
 #async def on_message(message):
 #    await bot.process_commands(message)
@@ -237,14 +239,35 @@ async def magic_eightball(ctx, *, question):
     
     await ctx.send(response)
 
-@bot.command()
-async def wallet(ctx):
-    """Command to display balance and inventory of a user's wallet (utilizes get_user_wallet)"""
-    pass
 
-@bot.command() 
+#E# - https://chatgpt.com/share/6753dcab-f708-8007-ad20-126bc14bcd10 - Chatlog for help debugging and getting resources on using the context(ctx) object
+@bot.command(name='wallet', description="Allow user's to view their wallet's contents")
+async def wallet(ctx):
+    """Command to display balance and inventory of a user's wallet (utilizes get_user_wallet & create_user_wallet)"""
+    """If a user is existing in the server but doesn't have a wallet, create one for them"""
+    ##Attributes to create a wallet and address user
+    user_id = ctx.author.id 
+    name = ctx.author.name 
+
+    #Retrieval of data from WALLETS data table 
+    wallet_contents = await get_user_wallet(user_id)
+
+    if wallet_contents: #If the wallet exists, display contents and balance
+        balance = wallet_contents.balance 
+        tomatoes = wallet_contents.number_of_tomatoes
+        await ctx.send(f"💸 {name}, your wallet balance is ${balance}\n You currently have {tomatoes} tomatoes 🍅")
+    else: #Otherwise, the wallet doesn't exist, so create one for the user and add it to the database
+        initial_balance = 0
+        initial_tomatoes = 0
+        await create_user_wallet(user_id, initial_balance, initial_tomatoes)
+        await ctx.send(f"💯 {name}, your wallet has successfully been created with a balance of ${initial_balance} and inventory of {initial_tomatoes}")
+
+
+
+#TODO: Flesh out this bot command
+@bot.command(name='change_balance', description="Allows server admins to change balance of a user's wallet")
 @commands.has_permissions(administrator=True) #Only allow server admins to interact with this command 
-async def update_wallet_balance(): 
+async def update_wallet_balance(ctx): 
     """Command to allow server admins to change a user's balance"""
     pass
 
