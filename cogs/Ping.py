@@ -32,7 +32,5 @@ class Ping(commands.Cog):
     async def echo(self, ctx: commands.Context, message: str):
         await ctx.send(message)
 
-
-
 async def setup(bot):
     await bot.add_cog(Ping(bot))      #add_cog(NAME_OF_CLASS(client))   #case sensitive

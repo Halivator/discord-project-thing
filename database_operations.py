@@ -32,8 +32,15 @@ async def get_from_userguild(user_id: int):
         async with async_session() as db_session: 
             query_userguilds = await db_session.execute(select(UserGuild).filter(UserGuild.user_id == user_id))
 
-            userguild_record_to_get = query_userguilds.scalar_one_or_none() 
-            return userguild_record_to_get
+            userguilds_to_return = query_userguilds.scalars.all() #Using scalars.all to retain multiple records 
+
+        if not userguilds_to_return: 
+            print(f"User with {user_id} is not found in any servers.")
+            return None
+        
+        guild_ids = [guild.guild_id for guild in userguilds_to_return] #LIST of guild ids from the userguilds_to_return query
+        return guild_ids 
+    
     except Exception as e: #Similar to try-catch in C#
         print(f"User, {user_id}, is not found in any servers. Cannot be retrieved.") #Print to termimal for logging
         return None

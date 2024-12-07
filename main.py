@@ -260,7 +260,6 @@ async def wallet(ctx):
         await create_user_wallet(user_id, initial_balance, initial_tomatoes)
         await ctx.send(f"💯 {name}, your wallet has successfully been created with a balance of ${initial_balance} and inventory of {initial_tomatoes} tomatoes")
 
-
 #PORTME
 @bot.command(name='update_balance', description="Allows server administrators to change balance of a user's wallet")
 @commands.has_permissions(administrator=True) #Only allow server admins to interact with this command 
@@ -286,6 +285,32 @@ async def update_user_tomatoes(ctx, member:discord.Member, new_tomato_balance:in
         await ctx.send(f"Successfully updated {member.name}'s tomato balance to {new_tomato_balance} 🍅") #Success message when user's tomato count has been updated to db
     except Exception as ex: 
         await ctx.send(f"An error occurred while trying to update {member.name}'s wallet: {str(ex)}") #Otherwise display error message to discord
+
+#PORTME
+"""@bot.command(name='guilds', description="Displays the guilds a user shares with Brax")
+async def display_shared_guilds(ctx, member:discord.Member): 
+    user_id = member.id 
+    guilds = await get_from_userguild(user_id) 
+
+    if not guilds: 
+        await ctx.send(f"User {member.name} does not have any guild-related records stored 👎") #Print to terminal
+        return
+    
+    shared_guilds = [] #List to store shared guilds and iterate through for display 
+
+    for guild in bot.guilds: #Fetch the guilds in memory 
+        if guild.id in guilds: #If the guild id is also present in local guilds list 
+            shared_guilds.append(guild.name) #add to the end of the shared guilds list 
+
+    if not shared_guilds: #if not found in shared guilds,
+       await ctx.send(f"User {member.name} does not have any shared guilds with Brax, or, the database has not been updated")
+       return
+
+    message = "🍅 Shared Guilds with Brax 🍅"
+    for i, guild_name in enumerate(shared_guilds, start=1): 
+        message += f"{i}. {guild_name}\n"
+    
+    await ctx.send(message)"""
 
 async def load():
     for filename in os.listdir("./cogs"):
