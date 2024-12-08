@@ -171,7 +171,7 @@ async def load():
         if file.endswith(".py"):
             filename = file[:-3]
             if filename == "Help":
-                bot.remove_command('help')  # removed to accommodate for the Help.py cog
+                bot.remove_command("help")  # removed to accommodate for the Help.py cog
                 print(Yellow("[STATUS]:"), Blue(f"\t[{__name__}]"), BrightGreen(f"\tHelp.py detected. Removing standard !help command"))
             
             try:
