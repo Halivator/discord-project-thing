@@ -159,7 +159,6 @@ async def load():
     - Loads cogs
     - awaits db.[TABLE_NAME].create_table()
     """
-    bot.remove_command('help')  # removed to accommodate for the Help.py cog
     
     #for filename in os.listdir("./cogs"):
     #    if filename.endswith(".py"):
@@ -171,6 +170,10 @@ async def load():
     for file in os.listdir("./cogs"):
         if file.endswith(".py"):
             filename = file[:-3]
+            if filename == "Help":
+                bot.remove_command('help')  # removed to accommodate for the Help.py cog
+                print(Yellow("[STATUS]:"), Blue(f"\t[{__name__}]"), BrightGreen(f"\tHelp.py detected. Removing standard !help command"))
+            
             try:
                 await bot.load_extension(f"cogs.{filename}") #self.load
                 print(Blue(f"- {filename} ✅ "))
