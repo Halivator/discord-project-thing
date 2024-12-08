@@ -47,6 +47,7 @@ gif_list.append("https://tenor.com/bZfRo.gif")
 gif_fail = "https://tenor.com/view/sad-tomato-gif-14607666"
 
 class TomatoToss(commands.Cog):
+    """Let the tomatoes fly!!! Toss tomatoes at people and watch them lose money!"""
     def __init__(self, bot):
         self.bot = bot
 
