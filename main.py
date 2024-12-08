@@ -92,7 +92,7 @@ async def change_status():
     #print('{bot_status}'.format)
     next_activity = next(bot_status)
     logger.info(f"changing activity from {bot_status.__getstate__} to \'{next_activity}\'...")
-    print(Yellow("[STATUS]:"), DarkGrey(f"\tchanging activity to "), Grey("\'{next_activity}\'"))
+    print(Yellow("[STATUS]:"), DarkGrey(f"\tchanging activity to "), Grey(f"\'{next_activity}\'"))
     await bot.change_presence(status=discord.Status.online, activity=discord.Game(next_activity))
 
 

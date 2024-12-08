@@ -37,6 +37,7 @@ class FarmersMarketCog(commands.Cog):
 
     @commands.hybrid_command(name="market", description="Perform actions in your garden.")
     async def market(self, ctx: commands.Context):
+        """Buy or sell tomatoes at the Farmers Market! Be mindful of the current market value, though!"""
         balance = int(-1)
         
         # Create an embed

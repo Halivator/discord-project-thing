@@ -14,6 +14,7 @@ import aiosqlite
 import discord
 import logging
 import logging.handlers
+from pycolorise.colors import *
 
 from typing import Any, Optional
 
@@ -138,7 +139,7 @@ class Responses:
     async def open_resp(self, guild: discord.Guild) -> None:
         #logger.info('open response')
         #print('open response')
-        if self._v1: print(f'{__name__}: method: [open_resp]: \tTABLE_NAME: {TABLE_NAME}')
+        if self._v1: print(DarkGrey('[aio]:'), Black(f'\t\t{__name__}: method: [open_resp]: TABLE_NAME: {TABLE_NAME}'))
 
         conn = await self._db.connect()
         data = await self._db.execute(

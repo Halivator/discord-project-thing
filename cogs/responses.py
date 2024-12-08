@@ -17,6 +17,8 @@ from discord import app_commands
 import logging, logging.handlers
 import random
 import asyncio
+from pycolorise.colors import *
+
 logger = logging.getLogger(__name__)
 
 
@@ -86,7 +88,7 @@ class Responses(commands.Cog):
                 print(f'{__name__}:\t{message.author.name} is the same as self.user. Returning....')
             skip = True
         else:
-            print(f'>\t{message.author.name} | {message.channel.name} | {message.content}')
+            print(Blue('[MESSAGE]:'), BrightYellow(' >\t'), f'{message.channel.name} | {message.author.name} | {message.content}')
         
         
         
@@ -200,7 +202,7 @@ class Responses(commands.Cog):
                 await message.channel.send("Aw dang it!")
             
     
-        print(f'> {message.author.name} | {message.channel.name} | {message.content}')
+        print(Blue('[MSG OUT]:'), BrightYellow(' >\t'), f'{message.channel.name} | {message.author.name} | {message.content}')
         #await self.client.process_commands(message)
 
 #   ## TODO: Write and test this later. I'm done with substrings again
