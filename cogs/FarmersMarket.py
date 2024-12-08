@@ -162,8 +162,8 @@ class FarmersMarketCog(commands.Cog):
         view.add_item(button2)
 
         # Send Information to the logger and terminal
-        logger.info(f"[{__name__}]:\tGARDEN CALLED\n\t\tcontext: {ctx}")
-        print(f"[{__name__}]:\tGARDEN CALLED\n\t\tcontext: {ctx}")
+        logger.info(f"[{__name__}]:\FARMERSMARKET CALLED\n\t\tcontext: {ctx}")
+        print(f"[{__name__}]:\FARMERSMARKET CALLED\n\t\tcontext: {ctx}")
 
         # Send the message with the embed and buttons
         await ctx.send(embed=embed, view=view)
