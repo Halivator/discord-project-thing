@@ -1,28 +1,7 @@
-# discord-project-thing
-
-ideas so far:
-
-    - Conomy
-    - tomatoTomatoTomato
-    - Pandemonium
-
-Discord Bot must:
-
-    • Be connected to a database
-        ◦ Can be pregenerated, or not.
-        ◦ It’s required
-    • Be connected to an API
-    • Explain what it does, and why:
-        ◦ 
-------
-
-
-
-
-**Project 2 Phase 1 Report**
+# BraxCord
+**Project Requirements & Features**
 ----------------------
-                                            November 3rd, 2024
-
+                                            November 3rd, 2023
 
 **Bot Title:** BraxCord
 
@@ -31,23 +10,19 @@ Discord Bot must:
 
 **Capabilities & Features:**
 
-- **Theft** (ex: `!steal {@User} {optional:amountToSteal}` )
-    -	*Complexity:* S
-    -	*Functionality:* Implements the ability to steal from another user’s wallet or inventory. Theft has a cooldown period of one hour (one steal per hour).
-    -	**Impact on Community:** Provides users with an interactive way to pull pranks on their friends/other community members. Allows users to take in-game currency and items from other members with a limit to prevent spamming.
-- **Throw tomatoes** (ex: `!tomato {@User}` )
+- **Throw tomatoes** (ex: `!throw {@User}` )
     -	*Complexity:* S
     -	*Functionality:* Subtracts a tomato from a user’s tomato stockpile and posts a message @ing the user with of a tomato gif being thrown at the user. Tomato throwing has a 1-minute cooldown period. 
     -	*Impact on Community:* Keeps interactions with other members playful and lighthearted. A benefit of using the Garden and Farmer’s Market.
-- **Garden:**
+      	**Theft**
+     	- When throwing tomatoes at another user, users will lose a random amount of money from their wallet 
+- **Garden:** 
     - Commands:
-        - `!garden` (returns the current status of garden, plants, as well as seeds in inventory)
-        - `!plant` (to plant 1 tomato plant per use, but they must have a seed!)
-    	- `!water` (waters the plant, could potentially spoil plants if watered over 3 times in an hour, or will speed up growth slightly if used less than 3 times.)
+        - `!garden` (returns the current status of garden, plant and water options)
     - *Complexity:* L
     - *Functionality:* Allows user to grow tomatoes to add to their inventory after a certain amount of time has elapsed.
 	- *Impact on Community:* Provides users with a low stress way to engage with the bot and build up their in-game inventory.
-- **Farmers Market**  ( `!buy {amount}` , `!sell {amount}` )
+- **Farmers Market**  ( `!market` )
     - *Complexity:* M
 	- *Functionality:* To sell tomatoes for in-game currency and to buy seeds
 	- *Impact on Community:* Provides users with a fun way to interact with in-game currency/items and continue making a profit.
@@ -63,20 +38,15 @@ Discord Bot must:
 
 
 ------
-
-
-***BRANCHES***
+***STARTING BRANCHES***
 - Quinn
   - *sql-database-integration*
 - Eli
-  - *database-creation* 
-
-
-
-
-
-
-
+  - *database-creation*
+- Peyton
+  - *Pre-Market/Buttons-Test*
+- Hal
+  - *user-interactions*
 ----------
 
 **CURRENT BUGS/ISSUES:**
@@ -89,18 +59,9 @@ Discord Bot must:
 
 -----------
 
-**CURRENT TASKS**
+**FUTURE TASKS**
 -------------
-- Troubleshooting command prefixes (Q) (P)
-- Creating Database models and tables for Users, Guilds, UserGuilds via SQLite & SQLAlchemy (E) *complete*
-
-
-
----------------
-
-**To-Do**
----------------
-- Debugging commands and command prefix
+**Space for Brax devs to share future features and development ideas**
 
 ------------------
 
@@ -125,4 +86,4 @@ Discord Bot must:
   - Part 3: Activity Status
     - https://www.youtube.com/watch?v=Erir7v7YXR8
 - Initial code tutorial
-  - https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
+  - https://www.freecodecamp.org/news/create-a-discord-bot-with-python
