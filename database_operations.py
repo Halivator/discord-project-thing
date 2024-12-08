@@ -69,17 +69,21 @@ async def get_user_wallet(user_id: int):
         print(f"Wallet for user {user_id} cannot be retrieved: it either doesn't exsist, or entry was invalid.") #print to terminal
 
 #UPDATE
-async def update_user_wallet(user_id: int, updatedWallet:WalletModel):
+# Overhauled to work with async sqlalchemy
+async def update_user_wallet(user_id: int, updatedWallet: WalletModel):
      """Update the balance or number of tomatoes in user's wallet"""
      async with async_session() as db_session: 
-        wallet = db_session.query(Wallet).filter(Wallet.user_id == user_id).first() #ensure the user ID matches an id in the db 
+        wallet_to_query = await db_session.execute(select(Wallet).filter(Wallet.user_id == user_id)) #ensure the user ID matches an id in the db 
+        wallet = wallet_to_query.scalar_one_or_none() 
 
         if not wallet: 
-            raise HTTPException(response="Wallet not found, cannot update inventory", status=404) #display to terminal
+            print(f"Wallet for user {user_id} not found") #display to terminal
     
     #assign each of the updated attributes 
-        wallet.balance = updatedWallet.balance
-        wallet.number_of_tomatoes = updatedWallet.number_of_tomatoes
+        if updatedWallet.balance is not None: #If the balance isn't equivalent to the None type
+            wallet.balance = updatedWallet.balance #go ahead and update the balance 
+        if updatedWallet.number_of_tomatoes is not None: #If the number of tomatoes isn't equivalent to the None type
+            wallet.number_of_tomatoes = updatedWallet.number_of_tomatoes #go ahead and update the number of tomatoes
 
         await db_session.commit() #commit the changes to DB 
         await db_session.refresh(wallet) #refresh the attributes of the updated user

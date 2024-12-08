@@ -1,6 +1,6 @@
 #E: Shifting commands from main over to a Cog
 import discord
-from discord import commands
+from discord.ext import commands
 import logging 
 from data_models import UserGuild, Responses, Wallet, Base, async_session, initialize_db 
 from database_operations import add_to_userguild, get_from_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_user_wallet, WalletModel
@@ -59,6 +59,44 @@ class Wallet_Commands(commands.Cog):
             await ctx.send(f"Successfully updated {member.name}'s tomato balance to {new_tomato_balance} 🍅") #Success message when user's tomato count has been updated to db
         except Exception as ex: 
             await ctx.send(f"An error occurred while trying to update {member.name}'s wallet: {str(ex)}") #Otherwise display error message to discord
+
+
+    # ported over from Eli's main `@bot.event` events
+    @commands.Cog.listener("on_member_join")
+    @commands.guild_only()
+    async def make_wallet_on_join(self, member: discord.Member):
+        """When a member joins the server, create their wallet (utilizes create_user_wallet)"""
+        wallet_created = await create_user_wallet(user_id=member.id, initial_balance=0, starting_number_of_tomatoes=0)
+        if wallet_created: 
+            print(f"[{__name__}]\t[ EVENT ]: on_member_join:\tThe wallet was successfully created for {member.name} : {member.id}") #Print to terminal, since this happens by default, user does not need to see this message
+        else: 
+            print(f"[{__name__}]\t[ EVENT ]: on_member_join:\tThere was an error creating the wallet for {member.name} : {member.id}, or, a wallet already exists for this user")
+
+    # ported over from Eli's main `@bot.event` events
+    @commands.Cog.listener("on_guild_remove")
+    @commands.guild_only()
+    async def remove_users_on_guild_remove(self, guild: discord.Guild): 
+        """When the bot has been removed from the server, get rid of data stored by the bot"""
+        removal_count = await delete_from_userguild(guild_id=guild.id) #Remove from UserGuild table where guild_ids match
+
+        if removal_count > 0: 
+            print(f"[{__name__}]\t[ EVENT ]: on_guild_remove\tSuccessfully removed records for {guild.name} : {guild.id} from UserGuilds") ##For logging & testing
+        else: 
+            print(f"[{__name__}]\t[ EVENT ]: on_guild_remove\tError removing records for {guild.name} : {guild.id} from UserGuilds")
+
+    # ported over from Eli's main `@bot.event` events
+    @commands.Cog.listener("on_member_remove")
+    @commands.guild_only()
+    async def remove_wallet_on_member_remove(self, member: discord.Member): 
+        """When a member leaves the server, remove their wallet (utilizes delete_user_wallet)"""
+        wallet_deleted = await delete_user_wallet(user_id=member.id)
+        if wallet_deleted: 
+            print(f"[{__name__}]\t[ EVENT ]: on_member_remove\tThe wallet for user {member.name} : {member.id} has been successfully removed.")
+        else: 
+            print(f"[{__name__}]\t[ EVENT ]: on_member_remove\tThe wallet for user {member.name} could not be deleted, or was not found.")
+
+
+
 
 async def setup(client):
     await client.add_cog(Wallet_Commands(client)) #add_cog(NAME_OF_CLASS(client))   #case sensitive

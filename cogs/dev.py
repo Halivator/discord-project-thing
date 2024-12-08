@@ -81,7 +81,7 @@ class Dev(commands.Cog):
 			await ctx.message.delete()
 			works = True
 		except Exception as exc:
-			await ct = f'An error has occurred: {exc}'
+			ct = f'An error has occurred: {exc}'
 		try:
 			for cog in listdir('./cogs'):
 				if cog.endswith('.py') == True:
@@ -129,7 +129,7 @@ class Dev(commands.Cog):
 			await ctx.message.delete()
 			works = True
 		except Exception as exc:
-			await ct = f'An error has occurred: {exc}'
+			ct = f'An error has occurred: {exc}'
 		try:
 			self.bot.load_extension(self.check_cog(cog))
 		except Exception as exc:
@@ -162,7 +162,7 @@ class Dev(commands.Cog):
 			await ctx.message.delete()
 			works = True
 		except Exception as exc:
-			await ct = f'An error has occurred: {exc}'
+			ct = f'An error has occurred: {exc}'
 		try:
 			self.bot.unload_extension(self.check_cog(cog))
 		except Exception as exc:
@@ -197,7 +197,7 @@ class Dev(commands.Cog):
 			await ctx.message.delete()
 			works = True
 		except Exception as exc:
-			await ct = f'An error has occurred: {exc}'
+			ct = f'An error has occurred: {exc}'
 
 		try:
 			self.bot.reload_extension(self.check_cog(cog))

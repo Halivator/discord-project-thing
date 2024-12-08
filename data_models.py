@@ -37,5 +37,5 @@ class Wallet(Base):
     __tablename__ = 'wallets'
 
     user_id = Column(String, primary_key=True)
-    balance = Column(Integer)
-    number_of_tomatoes = Column(Integer)
+    balance = Column(Integer, nullable=True)
+    number_of_tomatoes = Column(Integer, nullable=True)

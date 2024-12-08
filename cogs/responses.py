@@ -10,8 +10,9 @@ Makes use of the module responses_funcs.py
 
 
 import discord
+from itertools import cycle
 
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord import app_commands
 import logging, logging.handlers
 import random
@@ -69,21 +70,8 @@ class Responses(commands.Cog):
 #        await ctx.reply(embed=em, mention_author=False)
 #
 
-    #TODO: ELI USE THIS AS REF
-    #@commands.Cog.listener("on_member_join")
-    #@commands.guild_only()
-    #async def make_wallet_on_join(self, member):
-    #    channel = member.guild.system_channel
-    #    if channel is not None:
-    #        await channel.send(f'Welcome {member.mention}.')
-    #    wallet_created = await create_user_wallet(user_id=member.id, initial_balance=0, starting_number_of_tomatoes=0)
-    #    if wallet_created: 
-    #        print(f"The wallet was successfully created for {member.name} : {member.id}") #Print to terminal, since this happens by default, user does not need to see this message
-    #    else: 
-    #        print(f"There was an error creating the wallet for {member.name} : {member.id}, or, a wallet already exists for this user")
-     
-     
-     
+
+
     @commands.Cog.listener("on_message")    # events use this decorator
     @commands.guild_only()
     async def responder(self, message):
@@ -125,13 +113,15 @@ class Responses(commands.Cog):
 
         if not skip:
             options = []
+            #cycler = []
             await self.resp.open_resp(message.guild)
             data = await self.resp.get_resp(message.guild, message.content)
             #bdata = await self.resp.nget_resp(message.guild, message.content)
             #cdata = await self.resp.sget_resp(message.guild, message.content)
             checker = False
             if data is not None:
-                    checker = True
+                checker = True
+                #cycler.append(data)
             if self.resp._v3check(): print(f'{__name__}: [data]: has data?\t{checker}')
             
             #if message.guild.id not in [ resps["message_to_detect"] for resps in data]:
@@ -139,6 +129,11 @@ class Responses(commands.Cog):
             #wordber = message.content.split(' ')
             #for word in wordber:
             #print(f'{word} is {type(word)} type')
+            
+            
+            #self.test_the_data(data)
+            
+            
             
             
             original_value = None
@@ -208,7 +203,13 @@ class Responses(commands.Cog):
         print(f'> {message.author.name} | {message.channel.name} | {message.content}')
         #await self.client.process_commands(message)
 
-
+#   ## TODO: Write and test this later. I'm done with substrings again
+#    @tasks.loop(count = 1)
+#    async def test_the_data(self):
+#        #print('{bot_status}'.format)
+#        next_activity = next(bot_status)
+#        print(f"changing activity now to \'{next_activity}\'")
+#        await bot.change_presence(status=discord.Status.idle, activity=discord.Game(next_activity))
 
 
 

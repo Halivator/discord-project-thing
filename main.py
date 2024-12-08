@@ -19,13 +19,15 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 from itertools import cycle
-#import mylib
 import aiofiles, aiofiles.os
 import logging
 import logging.handlers
 import asyncio
-#import random
 from pycolorise.colors import *
+#https://matplotlib.org/stable/gallery/color/named_colors.html
+
+#https://ipython.readthedocs.io/en/4.x/api/generated/IPython.utils.PyColorize.html
+
 import os           #Q# os library is only used to get the TOKEN from the .env file
 
 
@@ -64,6 +66,9 @@ intents = discord.Intents.default() #all() #.default()
 # set particular Intents                        # https://discordpy.readthedocs.io/en/latest/api.html?highlight=client#intents
 intents.message_content = True
 intents.members = True
+intents.presences = True
+intents.guilds = True
+
 bot = MyClient(command_prefix=f'{Auth.COMMAND_PREFIX}',log_handler=handler,log_level=logging.DEBUG,intents=intents) #command_prefix=['$!'],      # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#ext-commands-commands
 
 #------------------------------------------------------------------------
@@ -74,7 +79,7 @@ status_phrases = [
     f"Throwing tomatoes ({Auth.COMMAND_PREFIX}help)",
     f"Shut up, nerd ({Auth.COMMAND_PREFIX}help)",
     f"Cyberbullying Children ({Auth.COMMAND_PREFIX}help)",
-    f"there's no //j here! ({Auth.COMMAND_PREFIX}help)",
+    f"there's no /j here! ({Auth.COMMAND_PREFIX}help)",
     ]
 """List of statuses to cycle through"""
 
@@ -87,8 +92,8 @@ async def change_status():
     #print('{bot_status}'.format)
     next_activity = next(bot_status)
     logger.info(f"changing activity from {bot_status.__getstate__} to \'{next_activity}\'...")
-    print(f"changing activity now to \'{next_activity}\'")
-    await bot.change_presence(status=discord.Status.idle, activity=discord.Game(next_activity))
+    print(Yellow("[STATUS]:"), DarkGrey(f"\tchanging activity to "), Grey("\'{next_activity}\'"))
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game(next_activity))
 
 
 #------------------------------------------------------------------------
@@ -97,11 +102,10 @@ async def change_status():
 
 @bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(bot))
-    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
-    print(f"Cycle timer tick has been set to {Util.timetick}")
+    print(Yellow("[STATUS]:"), Blue(f"\t[{__name__}]"), f'\tWe have logged in as ', BrightYellow(f'{bot.user}'), Cyan(f'(ID: {bot.user.id})'))
+    print(Yellow("[STATUS]:"), Blue(f"\t[{__name__}]"), f"\tStatus Cycle timer tick has been set to {Util.timetick} seconds")
     change_status.start()                #Q# video: Making a Discord Bot in Python (Part 3: Activity Status)
-    print("Ready!")
+    print(Yellow("[STATUS]:"), Blue(f"\t[{__name__}]"), BrightGreen(f"\tReady!"))
 
 
 @bot.command(name="dev_online", alias=["dev","do","running"])
@@ -111,83 +115,34 @@ async def dev_online(ctx):
     await ctx.reply(f"The dev that's running me is {devname}!")
 
 
-@bot.event
-#pre-defined function by discord to run when a bot is added to a server
-#when bot is added to server, populate the userguild table with members 
-async def on_guild_join(guild: discord.Guild): 
-    for member in guild.members: #E - for each of the members in the guild 
-        if member.bot == True: #E - if the member is a BOT, drop down to next block of code
-            continue 
-        try: 
-            await add_to_userguild(
-                user_id=member.id, 
-                guild_id=guild.id, 
-                guild_name=guild.name
-            )
-            print(f"Added user of {member.name} with ID {member.id} to UserGuild table for Guild: {guild.name}") #For logging/testing
-        except Exception: 
-            print(f"Could not add user {member.name} to UserGuild table") #For logging/testing'''
 
-@bot.event
-#When the bot has been removed from the server, get rid of data stored by the bot
-async def on_guild_remove(guild: discord.Guild): 
-    removal_count = await delete_from_userguild(guild_id=guild.id) #Remove from UserGuild table where guild_ids match
+# ( I went ahead and moved your bot events over to Commands.py, Eli. I hope you don't mind, but it makes merging easier)
 
-    if removal_count > 0: 
-        print(f"Successfully removed records for {guild.name} : {guild.id} from UserGuilds") ##For logging & testing
-    else: 
-        print(f"Error removing records for {guild.name} : {guild.id} from UserGuilds")
+#PORTME
+"""@bot.command(name='guilds', description="Displays the guilds a user shares with Brax")
+async def display_shared_guilds(ctx, member:discord.Member): 
+    user_id = member.id 
+    guilds = await get_from_userguild(user_id) 
 
+    if not guilds: 
+        await ctx.send(f"User {member.name} does not have any guild-related records stored 👎") #Print to terminal
+        return
+    
+    shared_guilds = [] #List to store shared guilds and iterate through for display 
 
-@bot.event 
-async def on_member_join(member: discord.Member): 
-    """When a member joins the server, create their wallet (utilizes create_user_wallet)"""
-    wallet_created = await create_user_wallet(user_id=member.id, initial_balance=0, starting_number_of_tomatoes=0)
-    if wallet_created: 
-        print(f"The wallet was successfully created for {member.name} : {member.id}") #Print to terminal, since this happens by default, user does not need to see this message
-    else: 
-        print(f"There was an error creating the wallet for {member.name} : {member.id}, or, a wallet already exists for this user")
-     
-@bot.event 
-async def on_member_remove(member: discord.Member): 
-    """When a member leaves the server, remove their wallet (utilizes delete_user_wallet)"""
-    wallet_deleted = await delete_user_wallet(user_id=member.id)
-    if wallet_deleted: 
-        print(f"The wallet for user {member.name} : {member.id} has been successfully removed.")
-    else: 
-        print(f"The wallet for user {member.name} could not be deleted, or was not found.")
+    for guild in bot.guilds: #Fetch the guilds in memory 
+        if guild.id in guilds: #If the guild id is also present in local guilds list 
+            shared_guilds.append(guild.name) #add to the end of the shared guilds list 
 
+    if not shared_guilds: #if not found in shared guilds,
+       await ctx.send(f"User {member.name} does not have any shared guilds with Brax, or, the database has not been updated")
+       return
 
-#E# - https://chatgpt.com/share/6753dcab-f708-8007-ad20-126bc14bcd10 - Chatlog for help debugging and getting resources on using the context(ctx) object
-@bot.command(name='wallet', description="Allow user's to view their wallet's contents")
-async def wallet(ctx):
-    """Command to display balance and inventory of a user's wallet (utilizes get_user_wallet & create_user_wallet)"""
-    """If a user is existing in the server but doesn't have a wallet, create one for them"""
-    ##Attributes to create a wallet and address user
-    user_id = ctx.author.id 
-    name = ctx.author.name 
-
-    #Retrieval of data from WALLETS data table 
-    wallet_contents = await get_user_wallet(user_id)
-
-    if wallet_contents: #If the wallet exists, display contents and balance
-        balance = wallet_contents.balance 
-        tomatoes = wallet_contents.number_of_tomatoes
-        await ctx.send(f"💸 {name}, your wallet balance is ${balance}\n You currently have {tomatoes} tomatoes 🍅")
-    else: #Otherwise, the wallet doesn't exist, so create one for the user and add it to the database
-        initial_balance = 0
-        initial_tomatoes = 0
-        await create_user_wallet(user_id, initial_balance, initial_tomatoes)
-        await ctx.send(f"💯 {name}, your wallet has successfully been created with a balance of ${initial_balance} and inventory of {initial_tomatoes} tomatoes")
-
-
-#TODO: Flesh out this bot command
-@bot.command(name='change_balance', description="Allows server admins to change balance of a user's wallet")
-@commands.has_permissions(administrator=True) #Only allow server admins to interact with this command 
-async def update_wallet_balance(ctx): 
-    """Command to allow server admins to change a user's balance"""
-    pass
-
+    message = "🍅 Shared Guilds with Brax 🍅"
+    for i, guild_name in enumerate(shared_guilds, start=1): 
+        message += f"{i}. {guild_name}\n"
+    
+    await ctx.send(message)"""
 
 
 # -----------------------------------------------------------------------------------------------------------
@@ -221,6 +176,12 @@ async def load():
                 print(Blue(f"- {filename} ✅ "))
             except:
                 print(Blue(f"- {filename} ❌ "))
+
+        # FOR COG DEBUGGING
+        #if file == "Commands.py":
+        #    filename = file[:-3]
+        #    await bot.load_extension(f"cogs.{filename}")
+    
     ####  HERE  ######
     await initialize_db()
     #await bot.db.bank.create_table()
@@ -261,6 +222,7 @@ async def main():
     async with bot:
         logger.info('running: main > _async with bot_')
         await load()
+        print(Yellow("[STATUS]:"), Blue(f"\t[{__name__}]"), BrightGreen(f"\tCogs are done loading!"))
         await bot.start(Auth.TOKEN)   # replaces client.run(TOKEN)
 
 

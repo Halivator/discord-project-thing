@@ -159,7 +159,7 @@ class Eightball(commands.Cog):
             if '[USER]' in response:
                 reslist = response.rsplit("[USER]")
                 spy = random.choice(memids)
-                response = (f'{reslist[0]}{member.display_name}{reslist[1]}')
+                response = (f'{reslist[0]}{member.mention}{reslist[1]}')
             
         await ctx.defer()
         await asyncio.sleep(5)
