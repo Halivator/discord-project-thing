@@ -35,21 +35,19 @@ class WalletCommands(commands.Cog):
                 await ctx.send(f"{name}'s wallet balance is ${balance}\nThey currently have {tomatoes} tomatoes 🍅")
         else: #Otherwise, the wallet doesn't exist, so create one for the user and add it to the database
             if member == ctx.author: 
-                initial_balance = 0
+                initial_balance = 500
                 initial_tomatoes = 0
                 await create_user_wallet(user_id, initial_balance, initial_tomatoes)
                 await ctx.send(f"💯 {name}, your wallet has successfully been created with a balance of ${initial_balance} and inventory of {initial_tomatoes} tomatoes")
             else: ##IF user does not have wallet created
                 await ctx.send(f"User does not currently have a wallet! They need to run the '!wallet' command! ❌👛")
 
-    #PORTME
     @commands.guild_only()
     @commands.command(name='update_balance', description="Allows server administrators to change balance of a user's wallet")
     @commands.has_permissions(administrator=True) #Only allow server admins to interact with this command 
     async def update_wallet_balance(self, ctx, member: discord.Member, new_balance:int): 
         """Update a user's wallet balance - for administrators only"""
         try: 
-            # FIXME
             try:
                 starting_wallet = await get_user_wallet(member.id)
             except Exception as ex: 
@@ -61,15 +59,13 @@ class WalletCommands(commands.Cog):
             await ctx.send(f"Successfully updated {member.name}'s balance to {new_balance} 💸") #Success message when user's balance has been updated to db 
         except Exception as ex: 
             await ctx.send(f"An error occurred while trying to update {member.name}'s balance: {str(ex)}") #otherwise display error message to discord
-
-    #PORTME 
+ 
     @commands.guild_only()
     @commands.command(name='update_tomatoes', description="Allow server administrators to change the number of tomatoes a user has in their wallet")
     @commands.has_permissions(administrator=True)
     async def update_user_tomatoes(self, ctx, member:discord.Member, new_tomato_balance:int):
         """Update the number of tomatoes a user has in their inventory - for administrators only"""
         try: 
-            # FIXME
             try:
                 starting_wallet = await get_user_wallet(member.id)
             except Exception as ex: 
@@ -88,7 +84,7 @@ class WalletCommands(commands.Cog):
     @commands.guild_only()
     async def make_wallet_on_join(self, member: discord.Member):
         """When a member joins the server, create their wallet (utilizes create_user_wallet)"""
-        wallet_created = await create_user_wallet(user_id=member.id, initial_balance=0, starting_number_of_tomatoes=0)
+        wallet_created = await create_user_wallet(user_id=member.id, initial_balance=500, starting_number_of_tomatoes=0)
         if wallet_created: 
             print(f"[{__name__}]\t[ EVENT ]: on_member_join:\tThe wallet was successfully created for {member.name} : {member.id}") #Print to terminal, since this happens by default, user does not need to see this message
         else: 
@@ -116,9 +112,6 @@ class WalletCommands(commands.Cog):
             print(f"[{__name__}]\t[ EVENT ]: on_member_remove\tThe wallet for user {member.name} : {member.id} has been successfully removed.")
         else: 
             print(f"[{__name__}]\t[ EVENT ]: on_member_remove\tThe wallet for user {member.name} could not be deleted, or was not found.")
-
-
-
 
 async def setup(client):
     await client.add_cog(WalletCommands(client)) #add_cog(NAME_OF_CLASS(client))   #case sensitive
