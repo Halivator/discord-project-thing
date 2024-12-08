@@ -185,7 +185,7 @@ class Help(commands.Cog):
         
         
         # !SET THOSE VARIABLES TO MAKE THE COG FUNCTIONAL!
-        prefix =  str(Auth.COMMAND_PREFIX) # ENTER YOUR PREFIX - loaded from config, as string or how ever you want!
+        prefix =  "!" #str(Auth.COMMAND_PREFIX) # ENTER YOUR PREFIX - loaded from config, as string or how ever you want!
         version = "indev" # enter version of your code
 	
         # setting owner name - if you don't wanna be mentioned remove line 49-60 and adjust help text (line 88) 
