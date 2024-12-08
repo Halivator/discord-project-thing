@@ -32,6 +32,7 @@ display_exception = True
 
 
 class GardenCog(commands.Cog):
+    """Grow and water your own tomatoes!"""
     def __init__(self, bot):
         self.bot = bot
 

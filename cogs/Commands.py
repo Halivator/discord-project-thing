@@ -8,7 +8,7 @@ from database_operations import add_to_userguild, get_from_userguild, delete_fro
 logger = logging.getLogger(__name__)
 
 class WalletCommands(commands.Cog): 
-
+    """Check how much money and how many tomatoes you have!"""
     def __init__(self, client):
         self.client = client
 
