@@ -166,17 +166,8 @@ class Help(commands.Cog):
     """
 
 
-
-
-
-
-
-
-
-
-
     @commands.command(aliases=["h","helpme","helpers","helpmaxxing"])
-    # @commands.bot_has_permissions(add_reactions=True,embed_links=True)
+    #@commands.bot_has_permissions(add_reactions=True,embed_links=True)
     async def help(self, ctx, *input):
         """Shows all modules of that bot"""
 
@@ -273,13 +264,12 @@ class Help(commands.Cog):
             emb = discord.Embed(title="It's a magical place.",
                                 description="I don't know how you got here. But I didn't see this coming at all.\n"
                                             "Would you please be so kind to report that issue to me on github?\n"
-                                            "https://github.com/nonchris/discord-fury/issues\n"
-                                            "Thank you! ~Chris",
+                                            "https://github.com/Halivator/discord-project-thing/issues\n"
+                                            "Thank you! ~Gambler's Anonymous",
                                 color=discord.Color.red())
 
         # sending reply embed using our own function defined above
         await send_embed(ctx, emb)
-
 
 async def setup(bot):
     await bot.add_cog(Help(bot))

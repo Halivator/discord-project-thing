@@ -147,9 +147,6 @@ async def display_shared_guilds(ctx, member:discord.Member):
 
 # -----------------------------------------------------------------------------------------------------------
 
-
-
-
 #Q# would ideally be eventually merged into the MyClient class
 async def load():
     """
