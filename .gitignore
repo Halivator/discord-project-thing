@@ -178,3 +178,4 @@ config.py
 personal_notes.txt
 responses.db
 economy.db
+*.db
