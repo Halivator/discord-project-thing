@@ -122,11 +122,15 @@ class TomatoToss(commands.Cog):
                                 if (temp_wallet.balance >= random_drop):
                                     # subtract the random_drop from the target's balance
                                     temp_wallet.balance -= random_drop
+                                    result_wallet.balance += drop_amount
+                                    await update_user_wallet(user_id,result_wallet)
                                     
                                 elif (temp_wallet.balance < random_drop):
                                     #store the amount of balance your target had and set it to 0 
                                     drop_amount = temp_wallet.balance
                                     temp_wallet.balance = 0
+                                    result_wallet.balance += drop_amount
+                                    await update_user_wallet(user_id,result_wallet)
                             else:
                                 print(f'[{__name__}]:\t[throw]\t{target.name} had no money to drop!')
                         
