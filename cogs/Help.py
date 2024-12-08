@@ -7,8 +7,6 @@ sys.path.append("..")
 
 from base import Auth
 
-
-
 """This custom help command is a perfect replacement for the default one on any Discord Bot written in Discord.py!
 However, you must put "bot.remove_command('help')" in your bot, and the command must be in a cog for it to work.
 
@@ -182,7 +180,6 @@ class Help(commands.Cog):
     async def help(self, ctx, *input):
         """Shows all modules of that bot"""
 
-        
         
         # !SET THOSE VARIABLES TO MAKE THE COG FUNCTIONAL!
         prefix = str(Auth.COMMAND_PREFIX) # ENTER YOUR PREFIX - loaded from config, as string or how ever you want!

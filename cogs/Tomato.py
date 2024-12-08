@@ -6,7 +6,7 @@
 #############################################################################
 
 from data_models import Wallet, Base
-from data_models import UserGuild, Responses, Wallet, Base, async_session, initialize_db
+from data_models import UserGuild, Wallet, Base, async_session, initialize_db
 from database_operations import add_to_userguild, get_from_userguild, delete_from_userguild, create_user_wallet, get_user_wallet, update_user_wallet, delete_user_wallet
 
 
@@ -29,7 +29,7 @@ sys.path.append("..")
 from base import Auth
 
 # Database setup
-SQLALCHEMY_DATABASE_URL = "sqlite:///./Bot.db" #data.db
+SQLALCHEMY_DATABASE_URL = "sqlite:///Bot.db" #data.db
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
