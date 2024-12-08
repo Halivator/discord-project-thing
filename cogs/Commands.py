@@ -35,7 +35,7 @@ class WalletCommands(commands.Cog):
                 await ctx.send(f"{name}'s wallet balance is ${balance}\nThey currently have {tomatoes} tomatoes 🍅")
         else: #Otherwise, the wallet doesn't exist, so create one for the user and add it to the database
             if member == ctx.author: 
-                initial_balance = 0
+                initial_balance = 500
                 initial_tomatoes = 0
                 await create_user_wallet(user_id, initial_balance, initial_tomatoes)
                 await ctx.send(f"💯 {name}, your wallet has successfully been created with a balance of ${initial_balance} and inventory of {initial_tomatoes} tomatoes")
@@ -88,7 +88,7 @@ class WalletCommands(commands.Cog):
     @commands.guild_only()
     async def make_wallet_on_join(self, member: discord.Member):
         """When a member joins the server, create their wallet (utilizes create_user_wallet)"""
-        wallet_created = await create_user_wallet(user_id=member.id, initial_balance=0, starting_number_of_tomatoes=0)
+        wallet_created = await create_user_wallet(user_id=member.id, initial_balance=500, starting_number_of_tomatoes=0)
         if wallet_created: 
             print(f"[{__name__}]\t[ EVENT ]: on_member_join:\tThe wallet was successfully created for {member.name} : {member.id}") #Print to terminal, since this happens by default, user does not need to see this message
         else: 
@@ -116,9 +116,6 @@ class WalletCommands(commands.Cog):
             print(f"[{__name__}]\t[ EVENT ]: on_member_remove\tThe wallet for user {member.name} : {member.id} has been successfully removed.")
         else: 
             print(f"[{__name__}]\t[ EVENT ]: on_member_remove\tThe wallet for user {member.name} could not be deleted, or was not found.")
-
-
-
 
 async def setup(client):
     await client.add_cog(WalletCommands(client)) #add_cog(NAME_OF_CLASS(client))   #case sensitive
