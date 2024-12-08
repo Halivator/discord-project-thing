@@ -54,7 +54,7 @@ class WalletCommands(commands.Cog):
                 starting_wallet = await get_user_wallet(member.id)
             except Exception as ex: 
                 await ctx.send(f"Inner error when trying to make a temporary wallet. An error occurred while trying to get {member.name}'s balance: {str(ex)}") #otherwise display error message to discord
-            updated_wallet = WalletModel(balance=new_balance, number_of_tomatoes=None)
+            updated_wallet = WalletModel(balance=new_balance, number_of_tomatoes=starting_wallet.number_of_tomatoes)
             #updated_wallet = WalletModel(balance=new_balance, number_of_tomatoes=starting_wallet.number_of_tomatoes)
 
             await update_user_wallet(user_id = member.id, updatedWallet=updated_wallet)
@@ -74,7 +74,7 @@ class WalletCommands(commands.Cog):
                 starting_wallet = await get_user_wallet(member.id)
             except Exception as ex: 
                 await ctx.send(f"Inner error when trying to make a temporary wallet. An error occurred while trying to get {member.name}'s wallet: {str(ex)}") #Otherwise display error message to discord
-            updated_wallet = WalletModel(balance=None, number_of_tomatoes=new_tomato_balance)
+            updated_wallet = WalletModel(balance=starting_wallet.balance, number_of_tomatoes=new_tomato_balance)
             #updated_wallet = WalletModel(balance=starting_wallet.balance, number_of_tomatoes=new_tomato_balance)
 
             await update_user_wallet(user_id=member.id, updatedWallet=updated_wallet)
