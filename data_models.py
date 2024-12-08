@@ -26,12 +26,12 @@ class UserGuild(Base):
     guild_id = Column(Integer, primary_key=True)
     guild_name = Column(String)
 
-class Responses(Base): 
+"""class Responses(Base): 
     __tablename__ = 'responses'
 
     response_id = Column(Integer, autoincrement=True)
     message_to_detect = Column(String, primary_key=True)
-    output = Column(String)
+    output = Column(String)""" #Responses table not currently needed, commenting out to utilize later
     
 class Wallet(Base): 
     __tablename__ = 'wallets'
