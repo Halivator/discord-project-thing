@@ -22,7 +22,7 @@ from sqlalchemy.orm import sessionmaker
 import random
 
 # Database setup
-SQLALCHEMY_DATABASE_URL = "sqlite:///./data.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./Bot.db" #data.db
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 Session = sessionmaker(bind=engine)
 

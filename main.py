@@ -221,6 +221,12 @@ async def load():
                 print(Blue(f"- {filename} ✅ "))
             except:
                 print(Blue(f"- {filename} ❌ "))
+
+        # FOR COG DEBUGGING
+        #if file == "dev.py":
+        #    filename = file[:-3]
+        #    await bot.load_extension(f"cogs.{filename}")
+    
     ####  HERE  ######
     await initialize_db()
     #await bot.db.bank.create_table()

@@ -6,3 +6,4 @@ asyncio
 pycolorise
 pydantic
 sqlalchemy
+logging
