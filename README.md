@@ -14,8 +14,7 @@
     -	*Complexity:* S
     -	*Functionality:* Subtracts a tomato from a user’s tomato stockpile and posts a message @ing the user with of a tomato gif being thrown at the user. Tomato throwing has a 1-minute cooldown period. 
     -	*Impact on Community:* Keeps interactions with other members playful and lighthearted. A benefit of using the Garden and Farmer’s Market.
-      	**Theft**
-     	- When throwing tomatoes at another user, users will lose a random amount of money from their wallet 
+    -   *Theft*: When throwing tomatoes at another user, users will lose a random amount of money from their wallet 
 - **Garden:** 
     - Commands:
         - `!garden` (returns the current status of garden, plant and water options)
