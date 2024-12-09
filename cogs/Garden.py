@@ -137,7 +137,7 @@ class GardenCog(commands.Cog):
 
                         logger.info(f"{interaction.user.display_name} watered their tomatoes and received {random_water} tomato(es).")
                         await interaction.followup.send(
-                            f"You planted {random_water} tomatoes! Total tomatoes: {result_wallet.number_of_tomatoes}.",
+                            f"You watered {random_water} tomatoes! Total tomatoes: {result_wallet.number_of_tomatoes}.",
                             ephemeral=True
                         )
                     else:
