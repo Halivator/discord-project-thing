@@ -50,10 +50,6 @@
 
 **CURRENT BUGS/ISSUES:**
 ----------------
-- Q- commands / command prefix does not work. on_message(message) logger shows that messages are being read, but they do not get seen as commands
-- Q- app_commands work. However, upon trying to access a local file (see: eightball commands), Discord error: "The application did not respond" occurs.
-  - Q- How do we get console output for when these errors occur?
-- Q- How does the default help command work? Can we set a custom help command if command prefixes aren't recognized?
 
 
 -----------
@@ -61,6 +57,7 @@
 **FUTURE TASKS**
 -------------
 **Space for Brax devs to share future features and development ideas**
+-E - Debug custom help command further, I want to figure out why the embeds aren't working as intended. For now- the default help command serves our needs. 
 
 ------------------
 
