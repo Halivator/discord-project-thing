@@ -36,8 +36,9 @@
 
 ------
 ***RECENT CHANGES***
-CONVERGENCE - MERGED INTO MAIN 
-All project files/bot functionalities are accessible through main now! We completed the great merge.
+
+-CONVERGENCE - MERGED INTO MAIN 
+-All project files/bot functionalities are accessible through main now! We completed the great merge.
 ------ 
 ***STARTING BRANCHES***
 - Quinn
