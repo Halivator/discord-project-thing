@@ -34,9 +34,11 @@
     - *Functionality:* Provides users with access to their total in-game currency and inventory; can be accessed at any time.
     - *Impact on Community:* Provides users with a way to interact with the rest of the game and see the reward of their time using the bot.
 
-
-
 ------
+***RECENT CHANGES***
+CONVERGENCE - MERGED INTO MAIN 
+All project files/bot functionalities are accessible through main now! We completed the great merge.
+------ 
 ***STARTING BRANCHES***
 - Quinn
   - *sql-database-integration*
@@ -57,6 +59,7 @@
 **FUTURE TASKS**
 -------------
 **Space for Brax devs to share future features and development ideas**
+
 -E - Debug custom help command further, I want to figure out why the embeds aren't working as intended. For now- the default help command serves our needs. 
 
 ------------------
